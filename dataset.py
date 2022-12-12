@@ -1,5 +1,4 @@
 import os
-import random
 import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset
@@ -11,6 +10,7 @@ class SP_500(Dataset):
         # splits = number of times a single cvs file will be split
 
         self.frequency = frequency
+        self.folder = frequency + '_prices'
         self.splits = splits
 
         self.files = os.listdir(frequency + '_prices')
@@ -25,5 +25,20 @@ class SP_500(Dataset):
     def __len__(self):
         return len(self.data)
 
+
     def __getitem__(self, idx):
-        pass
+        file = self.data[idx][0]
+        partition = self.data[idx][1]
+
+        data = pd.read_csv(self.folder + file, index_col=0)
+        data_split = np.array_split(data, self.splits)
+        data = data_split[partition]
+
+        x = data[['Open', 'High', 'Low', 'Close', 'Volume']]
+        y = data['Close']
+
+        x = x.to_numpy()
+        y = y.to_numpy()
+        y = y.reshape(-1, 1)
+
+        return x, y
