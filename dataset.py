@@ -30,7 +30,7 @@ class SP_500(Dataset):
         file = self.data[idx][0]
         partition = self.data[idx][1]
 
-        data = pd.read_csv(self.folder + file, index_col=0)
+        data = pd.read_csv(os.path.join(self.folder, file), index_col=0)
         data_split = np.array_split(data, self.splits)
         data = data_split[partition]
 
