@@ -13,8 +13,9 @@ from rnn import LSTM, GRU
 
 
 def train(args):
-    model, hidden_dim, num_layers, freq, splits, epochs, lr, bs, workers = \
-        args.model, args.hidden, args.layers, args.freq, args.splits, args.epochs, args.lr, args.batch, args.workers
+    k = 0
+    model, hidden_dim, num_layers, freq, splits, epochs, lr, bs, workers, lookback = \
+        args.model, args.hidden, args.layers, args.freq, args.splits, args.epochs, args.lr, args.batch, args.workers, args.lookback
 
     if freq == 'daily':
         dataset = SP_500('daily', splits)
@@ -37,7 +38,7 @@ def train(args):
 
         # For each batch in the dataloader
         for i, data in enumerate(tqdm(dataloader, desc='Training...', ascii=True, bar_format='{l_bar}{bar:50}{r_bar}{bar:-50b}')):
-            print(data.size())
+            pass
 
 
 def parse_args():
@@ -54,6 +55,7 @@ def parse_args():
     parser.add_argument('--batch', type=int, default=8, help='Batch size')
     parser.add_argument('--workers', type=int, default=0, help='Number of workers')
 
+    parser.add_argument('--lookback', type=int, default=5, help='Initial lookback range (days, weeks, or maonths)')
 
     args = parser.parse_args()
     return args

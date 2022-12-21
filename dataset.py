@@ -13,8 +13,21 @@ class SP_500(Dataset):
         self.folder = frequency + '_prices'
         self.splits = splits
 
-        self.files = os.listdir(frequency + '_prices')
+        self.files = os.listdir(self.folder)
+        files = []
 
+        max = 0
+        for file in self.files:
+            data = pd.read_csv(os.path.join(self.folder, file), index_col=0)
+            if len(data.index) > max:
+                max = len(data.index)
+
+        for file in self.files:
+            data = pd.read_csv(os.path.join(self.folder, file), index_col=0)
+            if len(data.index) == max:
+                files.append(file)
+
+        self.files = files
         self.data = []   # stores lists of csv and partition: [AAPL.csv, n]
 
         for file in self.files:
@@ -41,4 +54,4 @@ class SP_500(Dataset):
         y = y.to_numpy()
         y = y.reshape(-1, 1)
 
-        return x, y
+        return x, y, file
