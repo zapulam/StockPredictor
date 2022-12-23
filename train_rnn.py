@@ -14,20 +14,20 @@ from rnn import LSTM, GRU
 
 def train(args):
     k = 0
-    model, hidden_dim, num_layers, freq, splits, epochs, lr, bs, workers, lookback = \
-        args.model, args.hidden, args.layers, args.freq, args.splits, args.epochs, args.lr, args.batch, args.workers, args.lookback
+    model, hidden_dim, num_layers, freq, splits, epochs, lr, bs, workers, max_lookback, lookback = \
+        args.model, args.hidden, args.layers, args.freq, args.splits, args.epochs, args.lr, args.batch, args.workers,args.maxlookback, args.lookback
 
     if freq == 'daily':
         dataset = SP_500('daily', splits)
     elif freq == 'weekly':
         dataset = SP_500('weekly', splits)
-    else:
+    elif freq == 'monthly':
         dataset = SP_500('monthly', splits)
     dataloader = DataLoader(dataset=dataset, batch_size=bs, shuffle=True, num_workers=workers)
 
     if model == 'LSTM':
         model = LSTM(input_dim=5, hidden_dim=hidden_dim, output_dim=1, num_layers=num_layers)
-    else:
+    elif model == 'GRU':
         model = GRU(input_dim=5, hidden_dim=hidden_dim, output_dim=1, num_layers=num_layers)
 
     criterion = torch.nn.MSELoss(reduction='mean')
@@ -38,15 +38,23 @@ def train(args):
 
         # For each batch in the dataloader
         for i, data in enumerate(tqdm(dataloader, desc='Training...', ascii=True, bar_format='{l_bar}{bar:50}{r_bar}{bar:-50b}')):
-            pass
+            seqs = []
 
-            # data[0] = data
-            # data[1] = target
-            # data[2] = mins
-            # Data[3] = maxs
+            if max_lookback == True:
+                lookback = data[0].shape[1] - 1
 
-            # create list of tensors based on lookback... lookback < len
-            # train on each
+            for i in range(data[0].shape[1]-1 - lookback): 
+                seqs.append([data[0][:, i: i+lookback, :], data[1][:, i+1: i+1+lookback, :]])
+            
+            for seq in seqs:
+                pred = model(seq[0].float())
+                print('/n', seq[1].shape, pred.shape, '/n')
+
+                loss = criterion(pred, seq[1][-1])
+
+                optimiser.zero_grad()
+                loss.backward()
+                optimiser.step()
 
 
 def parse_args():
@@ -63,7 +71,8 @@ def parse_args():
     parser.add_argument('--batch', type=int, default=8, help='Batch size')
     parser.add_argument('--workers', type=int, default=0, help='Number of workers')
 
-    parser.add_argument('--lookback', type=int, default=5, help='Initial lookback range (days, weeks, or maonths)')
+    parser.add_argument('--maxlookback', type=bool, default=False, help='Set lookback to maximum allowed by splits')
+    parser.add_argument('--lookback', type=int, default=5, help='Lookback range (days, weeks, or months based on freq)')
 
     args = parser.parse_args()
     return args
