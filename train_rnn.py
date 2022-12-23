@@ -14,8 +14,10 @@ from rnn import LSTM, GRU
 
 def train(args):
     k = 0
-    model, hidden_dim, num_layers, freq, splits, epochs, lr, bs, workers, max_lookback, lookback = \
-        args.model, args.hidden, args.layers, args.freq, args.splits, args.epochs, args.lr, args.batch, args.workers,args.maxlookback, args.lookback
+    model, hidden_dim, num_layers, freq, splits, epochs, lr, \
+    bs, workers, max_lookback, lookback, device = \
+        args.model, args.hidden, args.layers, args.freq, args.splits, args.epochs, args.lr, \
+        args.batch, args.workers,args.maxlookback, args.lookback, args.device
 
     if freq == 'daily':
         dataset = SP_500('daily', splits)
@@ -29,6 +31,7 @@ def train(args):
         model = LSTM(input_dim=5, hidden_dim=hidden_dim, output_dim=1, num_layers=num_layers)
     elif model == 'GRU':
         model = GRU(input_dim=5, hidden_dim=hidden_dim, output_dim=1, num_layers=num_layers)
+    model.to(device)
 
     criterion = torch.nn.MSELoss(reduction='mean')
     optimiser = torch.optim.Adam(model.parameters(), lr=lr)
@@ -38,13 +41,18 @@ def train(args):
 
         # For each batch in the dataloader
         for i, data in enumerate(tqdm(dataloader, desc='Training...', ascii=True, bar_format='{l_bar}{bar:50}{r_bar}{bar:-50b}')):
+            inputs, targets = data[0], data[1]
+
+            if 'cuda' in device:
+                inputs, targets = inputs.cuda(), targets.cuda()
+            
             seqs = []
 
             if max_lookback == True:
-                lookback = data[0].shape[1] - 1
+                lookback = inputs.shape[1] - 1
 
-            for i in range(data[0].shape[1]-1 - lookback): 
-                seqs.append([data[0][:, i: i+lookback, :], data[1][:, i+1: i+1+lookback, :]])
+            for i in range(inputs.shape[1]-1 - lookback): 
+                seqs.append([inputs[:, i: i+lookback, :], targets[:, i+1: i+1+lookback, :]])
             
             for seq in seqs:
                 pred = model(seq[0].float())
@@ -73,6 +81,8 @@ def parse_args():
 
     parser.add_argument('--maxlookback', type=bool, default=False, help='Set lookback to maximum allowed by splits')
     parser.add_argument('--lookback', type=int, default=5, help='Lookback range (days, weeks, or months based on freq)')
+
+    parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:n or cpu')
 
     args = parser.parse_args()
     return args
