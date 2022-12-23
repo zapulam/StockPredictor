@@ -40,6 +40,14 @@ def train(args):
         for i, data in enumerate(tqdm(dataloader, desc='Training...', ascii=True, bar_format='{l_bar}{bar:50}{r_bar}{bar:-50b}')):
             pass
 
+            # data[0] = data
+            # data[1] = target
+            # data[2] = mins
+            # Data[3] = maxs
+
+            # create list of tensors based on lookback... lookback < len
+            # train on each
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
