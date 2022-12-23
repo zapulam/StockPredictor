@@ -20,7 +20,6 @@ def get_data(args):
     dir = os.getcwd()
     dir = dir.split(os.sep)
     dir = os.path.join('C:\\', *dir[1:-1], folder)
-    print(dir)
     os.makedirs(dir, exist_ok=True)
 
     df = pd.read_csv(info)
