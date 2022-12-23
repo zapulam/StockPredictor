@@ -50,8 +50,14 @@ class SP_500(Dataset):
         x = data[['Open', 'High', 'Low', 'Close', 'Volume']]
         y = data['Close']
 
+        mins, maxs = x.min(), x.max()
+
+        x = (x-x.min())/(x.max()-x.min())
+        y = (y-y.min())/(y.max()-y.min())
+
         x = x.to_numpy()
         y = y.to_numpy()
+
         y = y.reshape(-1, 1)
 
-        return x, y, file
+        return x, y, mins, maxs
