@@ -17,7 +17,11 @@ def get_data(args):
         url = 'https://query1.finance.yahoo.com/v7/finance/download/{x}?period1=1513036800&period2=1670803200&interval=1mo&events=history&includeAdjustedClose=true'
         folder = 'monthly_prices'
 
-    os.makedirs(folder, exist_ok=True)
+    dir = os.getcwd()
+    dir = dir.split(os.sep)
+    dir = os.path.join('C:\\', *dir[1:-1], folder)
+    print(dir)
+    os.makedirs(dir, exist_ok=True)
 
     df = pd.read_csv(info)
     symbols = df['Symbol'].tolist()
@@ -29,7 +33,7 @@ def get_data(args):
         get = requests.get(url.format(x=symbol))
         if get.status_code != 404:
             data = pd.read_csv(url.format(x=symbol))
-            data.to_csv(os.path.join(folder, symbol + '.csv'))
+            data.to_csv(os.path.join(dir, symbol + '.csv'))
         print('- DONE')
 
     print('All stock historical price files saved to ' + folder, end='\n')
