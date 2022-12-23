@@ -14,22 +14,25 @@ class SP_500(Dataset):
         self.splits = splits
 
         self.files = os.listdir(self.folder)
-        files = []
+        new_files = []
 
+        # set max file length ( 5 years of data )
         max = 0
         for file in self.files:
             data = pd.read_csv(os.path.join(self.folder, file), index_col=0)
             if len(data.index) > max:
                 max = len(data.index)
 
+        # remove files with less than 5 years of data
         for file in self.files:
             data = pd.read_csv(os.path.join(self.folder, file), index_col=0)
             if len(data.index) == max:
-                files.append(file)
+                new_files.append(file)
 
-        self.files = files
+        self.files = new_files
         self.data = []   # stores lists of csv and partition: [AAPL.csv, n]
 
+        # create partitions list: [AAPL.csv, n]
         for file in self.files:
             for i in range(self.splits):
                 self.data.append([file, i])
@@ -40,23 +43,32 @@ class SP_500(Dataset):
 
 
     def __getitem__(self, idx):
-        file = self.data[idx][0]
-        partition = self.data[idx][1]
+        file = self.data[idx][0]        # cvs to read from
+        partition = self.data[idx][1]   # partion based on number of splits
 
         data = pd.read_csv(os.path.join(self.folder, file), index_col=0)
         data_split = np.array_split(data, self.splits)
+
+        # ensure all splits are of equal length
+        if data_split[0].shape[0] != data_split[-1].shape[0]:
+            for i, sub in enumerate(data_split):
+                if sub.shape[0] != data_split[-1].shape[0]:
+                    data_split[i] = data_split[i][0:-1]
+
         data = data_split[partition]
 
-        x = data[['Open', 'High', 'Low', 'Close', 'Volume']]
-        y = data['Close']
+        x = data[['Open', 'High', 'Low', 'Close', 'Volume']]    # data
+        y = data['Close']                                       # target
 
-        mins, maxs = x.min(), x.max()
+        mins, maxs = x.min(), x.max()                           # valuess for normalization
 
         x = (x-x.min())/(x.max()-x.min())
         y = (y-y.min())/(y.max()-y.min())
 
         x = x.to_numpy()
         y = y.to_numpy()
+        mins = mins.to_numpy()
+        maxs = maxs.to_numpy()
 
         y = y.reshape(-1, 1)
 
