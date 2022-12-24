@@ -60,7 +60,7 @@ class SP_500(Dataset):
         x = data[['Open', 'High', 'Low', 'Close', 'Volume']]    # data
         y = data['Close']                                       # target
 
-        mins, maxs = x.min(), x.max()                           # valuess for normalization
+        mins, maxs = x.min(), x.max()                           # values for normalization
 
         x = (x-x.min())/(x.max()-x.min())
         y = (y-y.min())/(y.max()-y.min())
