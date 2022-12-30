@@ -92,7 +92,7 @@ def train(args):
                 loss = criterion(pred, seq[1].float())
 
                 t_loss.append(loss.item())
-                t_acc.extend(torch.abs(pred[:, 4] - seq[1][:, 4]).squeeze().tolist())
+                t_acc.extend(torch.abs(100 - (pred[:, 4] - seq[1][:, 4])).squeeze().tolist())
                 #t_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
 
                 optimiser.zero_grad()
@@ -116,7 +116,7 @@ def train(args):
                     loss = criterion(pred, seq[1].float())
 
                     v_loss.append(loss.item())
-                    v_acc.extend(torch.abs(pred[:, 4] - seq[1][:, 4]).squeeze().tolist())
+                    v_acc.extend(torch.abs(100 - (pred[:, 4] - seq[1][:, 4])).squeeze().tolist())
                     #v_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
 
         end = time.time()
@@ -135,9 +135,9 @@ def train(args):
 
         print(f"Time: {round(end-start, 3)}   ", end="")
         print(f"Train Loss: {round(avg_t_loss, 5)}   ", end="")
-        print(f"Train Diff: {round(avg_t_acc, 5)}   ", end="")
+        print(f"Train Acc: {round(avg_t_acc, 5)}   ", end="")
         print(f"Valid Loss: {round(avg_v_loss, 5)}   ", end="")
-        print(f"Valid Diff: {round(avg_v_acc, 5)}   ", end="\n")
+        print(f"Valid Acc: {round(avg_v_acc, 5)}   ", end="\n")
         
     print(f'\nFinished Training - Models and metrics saved to: \"{savepath}\"')
 
