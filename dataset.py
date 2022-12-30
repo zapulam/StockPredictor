@@ -1,4 +1,5 @@
 import os
+import torch
 import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset
@@ -57,19 +58,14 @@ class SP_500(Dataset):
 
         data = data_split[partition]
 
-        x = data[['Open', 'High', 'Low', 'Close', 'Volume']]    # data
-        y = data['Close']                                       # target
+        x = data[['Open', 'High', 'Low', 'Volume', 'Close']]    # data
 
         mins, maxs = x.min(), x.max()                           # values for normalization
 
         x = (x-x.min())/(x.max()-x.min())
-        y = (y-y.min())/(y.max()-y.min())
 
-        x = x.to_numpy()
-        y = y.to_numpy()
-        mins = mins.to_numpy()
-        maxs = maxs.to_numpy()
+        x = torch.tensor(x.values)
+        mins = torch.tensor(mins.values)
+        maxs = torch.tensor(maxs.values)
 
-        y = y.reshape(-1, 1)
-
-        return x, y, mins, maxs
+        return x, mins, maxs
