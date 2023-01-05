@@ -77,8 +77,6 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, choices=['LSTM', 'GRU'], help='Model to be used')
     parser.add_argument('--weights', type=str, help='Path to model weights')
-    parser.add_argument('--hidden', type=int, default=32, help='Number of features in hidden state')
-    parser.add_argument('--layers', type=int, default=2, help='Number of recurrent layers')
 
     parser.add_argument('--freq', type=str, choices=['daily', 'weekly', 'monthly'], default='daily', help='Predict daily, weekly, or monthly')
     parser.add_argument('--splits', type=int, default=1, help='Number of times to split the data')
