@@ -8,6 +8,7 @@ class LSTM(nn.Module):
         super(LSTM, self).__init__()
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
+        self.kwargs = {'input_dim': input_dim, 'hidden_dim': hidden_dim, 'num_layers': num_layers, 'output_dim': output_dim}
         
         self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_dim, output_dim)
@@ -25,6 +26,7 @@ class GRU(nn.Module):
         super(GRU, self).__init__()
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
+        self.kwargs = {'input_dim': input_dim, 'hidden_dim': hidden_dim, 'num_layers': num_layers, 'output_dim': output_dim}
         
         self.gru = nn.GRU(input_dim, hidden_dim, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_dim, output_dim)

@@ -1,4 +1,3 @@
-
 import os
 import time
 import torch
@@ -22,7 +21,7 @@ def train(args):
     if not os.path.isdir('models'):
         os.mkdir('models')
 
-    k, newpath = 2, savepath
+    k, newpath = 2, 'models/' + savepath
     while True:
         if not os.path.isdir(newpath):
             os.mkdir(newpath)
@@ -121,7 +120,7 @@ def train(args):
 
         end = time.time()
 
-        torch.save(model.state_dict(), os.path.join(savepath, "weights\last.pth"))
+        torch.save([model.kwargs, model.state_dict()], os.path.join(savepath, "weights\last.pth"))
 
         avg_t_loss = sum(t_loss) / len(t_loss)
         avg_v_loss = sum(v_loss) / len(v_loss)
@@ -131,7 +130,7 @@ def train(args):
 
         if avg_v_loss < best:
             best = avg_v_loss
-            torch.save(model.state_dict(), os.path.join(savepath, "weights\\best.pth"))
+            torch.save([model.kwargs, model.state_dict()], os.path.join(savepath, "weights\\best.pth"))
 
         print(f"Time: {round(end-start, 3)}   ", end="")
         print(f"Train Loss: {round(avg_t_loss, 5)}   ", end="")
