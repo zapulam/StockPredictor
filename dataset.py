@@ -62,7 +62,7 @@ class SP_500(Dataset):
 
         mins, maxs = x.min(), x.max()                           # values for normalization
 
-        x = (x-x.min())/(x.max()-x.min())
+        x = (x-mins)/(maxs-mins)
 
         x = torch.tensor(x.values)
         mins = torch.tensor(mins.values)
