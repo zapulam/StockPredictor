@@ -79,7 +79,6 @@ def parse_args():
     parser.add_argument('--weights', type=str, help='Path to model weights')
 
     parser.add_argument('--freq', type=str, choices=['daily', 'weekly', 'monthly'], default='daily', help='Predict daily, weekly, or monthly')
-    parser.add_argument('--splits', type=int, default=1, help='Number of times to split the data')
 
     parser.add_argument('--all', type=bool, default=False, help='Predict on all S&P 500 stocks')
     parser.add_argument('--stocks', type=list, choices=symbols, default=[], help='Stocks to predict (use tickers)')
