@@ -84,7 +84,6 @@ def parse_args():
     parser.add_argument('--stocks', type=list, choices=symbols, default=[], help='Stocks to predict (use tickers)')
     parser.add_argument('--steps', type=int, default=25, help='Future time steps to predict')
 
-
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:n or cpu')
 
     parser.add_argument('--savepath', type=str, help='Path to save the models (best and last)')
