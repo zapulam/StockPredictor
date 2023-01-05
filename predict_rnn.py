@@ -1,14 +1,8 @@
 import os
-import time
 import torch
 import argparse
 import pandas as pd
 
-from tqdm import tqdm
-from torch.utils.data import DataLoader
-from sklearn.model_selection import train_test_split
-
-from dataset import SP_500
 from rnn import LSTM, GRU
 
 
@@ -76,8 +70,8 @@ def predict(args):
         closes.to(os.path.join(newpath, stock))
 
     print(f"\nAll predictions saved to \"{newpath}\"")
-         
-            
+
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
