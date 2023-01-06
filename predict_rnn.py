@@ -18,6 +18,7 @@ def predict(args):
     if not os.path.isdir('predictions'):
         os.mkdir('predictions')
 
+    # Create unique save path for predictions
     k, newpath = 2, 'predictions/' + savepath
     while True:
         if not os.path.isdir(newpath):
@@ -26,10 +27,10 @@ def predict(args):
         else:
             newpath = savepath + "_" + str(k)
             k += 1
-    os.mkdir(os.path.join(newpath))
 
     print(f"\n--> Created folder \"{newpath}\"")
 
+    # Load model
     if model == 'LSTM':
         kwargs, state = torch.load(weights)
         model = LSTM(**kwargs)
@@ -42,6 +43,7 @@ def predict(args):
 
     print(f"--> Model loaded from \"{weights}\"\n")
 
+    # Create predictions for desired stocks
     for _, stock in enumerate(stocks):
         print(f"Predicting future prices for \"{stock}\"")
 
@@ -81,7 +83,7 @@ def parse_args():
     parser.add_argument('--freq', type=str, choices=['daily', 'weekly', 'monthly'], default='daily', help='Predict daily, weekly, or monthly')
 
     parser.add_argument('--all', type=bool, default=False, help='Predict on all S&P 500 stocks')
-    parser.add_argument('--stocks', type=list, choices=symbols, default=[], help='Stocks to predict (use tickers)')
+    parser.add_argument('--stocks', choices=symbols, help='Stocks to predict (use tickers)')
     parser.add_argument('--steps', type=int, default=25, help='Future time steps to predict')
 
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:n or cpu')
