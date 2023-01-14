@@ -21,18 +21,20 @@ def train(args):
     if not os.path.isdir('models'):
         os.mkdir('models')
 
-    k, newpath = 2, savepath
+    # Create unique save path
+    k, newpath = 2, 'models/' + savepath
     while True:
         if not os.path.isdir(newpath):
             os.mkdir(newpath)
             break
         else:
-            newpath = savepath + "_" + str(k)
+            newpath = 'models/' + savepath + "_" + str(k)
             k += 1
     os.mkdir(os.path.join(newpath, 'weights'))
 
     print(f"\n--> Created folder \"{newpath}\"")
 
+    # Load data
     if freq == 'daily':
         dataset = SP_500('daily', splits)
         train, val = train_test_split(dataset, test_size=0.2, random_state=42)
@@ -43,11 +45,13 @@ def train(args):
         dataset = SP_500('monthly', splits)
         train, val = train_test_split(dataset, test_size=0.2, random_state=42)
 
+    # Create dataloaders
     trainloader = DataLoader(dataset=train, batch_size=bs, shuffle=True, num_workers=workers)
     valloader = DataLoader(dataset=val, batch_size=bs, shuffle=True, num_workers=workers)
 
     print("--> Dataloaders created for training and validating")
 
+    # Create model
     if model == 'LSTM':
         model = LSTM(input_dim=5, hidden_dim=hidden_dim, num_layers=num_layers, output_dim=5)
     elif model == 'GRU':
@@ -56,6 +60,7 @@ def train(args):
 
     print("--> Model created and sent to device")
 
+    # Loss and optimizer
     criterion = torch.nn.MSELoss(reduction='mean')
     optimiser = torch.optim.Adam(model.parameters(), lr=lr)
 
@@ -80,24 +85,25 @@ def train(args):
 
             seqs = []   # list of [tensor(bs, 0-n, feats), tensor(bs, n+1, feats)]
 
-            # create sequences of min length lookback and max length inputs.shape[1]
+            # Create sequences of min length lookback and max length inputs.shape[1]
             for i in range(lookback, inputs.shape[1]-1):
                 seqs.append([inputs[:, 0: lookback, :], inputs[:, lookback+1, :]])   # [inputs[bs, 0-n, feats], inputs[bs, n+1, feats]]
 
-            # train model for each sequence
+            # Train model for each sequence
             for _, seq in enumerate(seqs):
                 pred = model(seq[0].float())
 
                 loss = criterion(pred, seq[1].float())
 
                 t_loss.append(loss.item())
-                t_acc.extend(torch.abs(100 - (pred[:, 4] - seq[1][:, 4])).squeeze().tolist())
-                #t_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
+                t_acc.extend((1 - torch.abs(pred[:, 4] - seq[1][:, 4])).tolist())
+                ###t_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
 
                 optimiser.zero_grad()
                 loss.backward()
                 optimiser.step()
 
+        # Validation
         with torch.no_grad():
             for _, data in enumerate(tqdm(valloader, desc='Validating', ascii=True, bar_format='{l_bar}{bar:50}{r_bar}{bar:-50b}')):
                 inputs = data[0]
@@ -105,32 +111,38 @@ def train(args):
                 if 'cuda' in device:
                     inputs = inputs.cuda()
 
+                # Create sequences of min length lookback and max length inputs.shape[1]
                 for i in range(lookback, inputs.shape[1]-1):
                     if i + lookback < inputs.shape[1]:
                         seqs.append([inputs[:, 0: lookback, :], inputs[:, lookback+1, :]])
 
+                # Validate for each sequence
                 for _, seq in enumerate(seqs):
                     pred = model(seq[0].float())
 
                     loss = criterion(pred, seq[1].float())
 
                     v_loss.append(loss.item())
-                    v_acc.extend(torch.abs(100 - (pred[:, 4] - seq[1][:, 4])).squeeze().tolist())
-                    #v_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
+                    v_acc.extend((1 - torch.abs(pred[:, 4] - seq[1][:, 4])).tolist())
+                    ###v_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
 
         end = time.time()
 
-        torch.save(model.state_dict(), os.path.join(savepath, "weights\last.pth"))
+        # Save most recent model
+        torch.save([model.kwargs, model.state_dict()], os.path.join(newpath, "weights\last.pth"))
 
+        # Calculate average losses
         avg_t_loss = sum(t_loss) / len(t_loss)
         avg_v_loss = sum(v_loss) / len(v_loss)
 
+        # Calculate average accuracies
         avg_t_acc = sum(t_acc) / len(t_acc)
         avg_v_acc = sum(v_acc) / len(v_acc)
 
+        # Save best model
         if avg_v_loss < best:
             best = avg_v_loss
-            torch.save(model.state_dict(), os.path.join(savepath, "weights\\best.pth"))
+            torch.save([model.kwargs, model.state_dict()], os.path.join(newpath, "weights\\best.pth"))
 
         print(f"Time: {round(end-start, 3)}   ", end="")
         print(f"Train Loss: {round(avg_t_loss, 5)}   ", end="")
@@ -138,7 +150,7 @@ def train(args):
         print(f"Valid Loss: {round(avg_v_loss, 5)}   ", end="")
         print(f"Valid Acc: {round(avg_v_acc, 5)}   ", end="\n")
         
-    print(f'\nFinished Training - Models and metrics saved to: \"{savepath}\"')
+    print(f'\nFinished Training - Models and metrics saved to: \"{newpath}\"')
 
 
 
@@ -149,7 +161,7 @@ def parse_args():
     parser.add_argument('--layers', type=int, default=2, help='Number of recurrent layers')
 
     parser.add_argument('--freq', type=str, choices=['daily', 'weekly', 'monthly'], default='daily', help='Predict daily, weekly, or monthly')
-    parser.add_argument('--splits', type=int, default=5, help='Number of times to split the data')
+    parser.add_argument('--splits', type=int, default=1, help='Number of times to split each csv')
 
     parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=0.01, help='Learning rate')
