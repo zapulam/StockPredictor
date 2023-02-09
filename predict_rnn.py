@@ -58,6 +58,7 @@ def predict(args):
 
         x = torch.tensor(x.values)
         x = torch.unsqueeze(x, dim=0)
+        
         mins = torch.tensor(mins.values)
         maxs = torch.tensor(maxs.values)
 
