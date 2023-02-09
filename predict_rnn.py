@@ -25,7 +25,7 @@ def predict(args):
             os.mkdir(newpath)
             break
         else:
-            newpath = savepath + "_" + str(k)
+            newpath = 'predictions/' + savepath + "_" + str(k)
             k += 1
 
     print(f"\n--> Created folder \"{newpath}\"")
@@ -47,7 +47,7 @@ def predict(args):
     for _, stock in enumerate(stocks):
         print(f"Predicting future prices for \"{stock}\"")
 
-        predictions = torch.rand(0,5)
+        predictions = torch.rand(1,0,5)
 
         data = pd.read_csv(freq + '_prices/' + stock + '.csv', index_col=0)
         x = data[['Open', 'High', 'Low', 'Volume', 'Close']]    # input data
@@ -57,19 +57,21 @@ def predict(args):
         x = (x-mins)/(maxs-mins)
 
         x = torch.tensor(x.values)
+        x = torch.unsqueeze(x, dim=0)
         mins = torch.tensor(mins.values)
         maxs = torch.tensor(maxs.values)
 
         for _ in range(steps):
             pred = model(x.float())                         # model prediction for one time step
+            pred = torch.unsqueeze(pred, dim=0)
+            
+            predictions = torch.cat((predictions, pred), dim=1)    # append predicition to predictions tensor
 
-            predictions = torch.cat((predictions, pred))    # append predicition to predictions tensor
-
-            x = torch.cat((x, pred))                        # append predicition to input data for next time step
+            x = torch.cat((x, pred), dim=1)                        # append predicition to input data for next time step
 
         predictions = predictions*(maxs-mins)+mins
-        closes = pd.DataFrame(predictions.numpy(), columns=['Open', 'High', 'Low', 'Volume', 'Close'])
-        closes.to(os.path.join(newpath, stock))
+        predictions = pd.DataFrame(predictions.squeeze().detach().numpy(), columns=['Open', 'High', 'Low', 'Volume', 'Close'])
+        predictions.to_csv(os.path.join(newpath, stock))
 
     print(f"\nAll predictions saved to \"{newpath}\"")
 
@@ -83,7 +85,7 @@ def parse_args():
     parser.add_argument('--freq', type=str, choices=['daily', 'weekly', 'monthly'], default='daily', help='Predict daily, weekly, or monthly')
 
     parser.add_argument('--all', type=bool, default=False, help='Predict on all S&P 500 stocks')
-    parser.add_argument('--stocks', choices=symbols, help='Stocks to predict (use tickers)')
+    parser.add_argument('--stocks', nargs='+', choices=symbols, help='Stocks to predict (use tickers)')
     parser.add_argument('--steps', type=int, default=25, help='Future time steps to predict')
 
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:n or cpu')
