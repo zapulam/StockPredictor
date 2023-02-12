@@ -1,10 +1,10 @@
 import os
+import sys
 import torch
 import argparse
 import pandas as pd
 
 from rnn import LSTM, GRU
-
 
 
 def predict(args):
@@ -45,17 +45,17 @@ def predict(args):
 
     # Create predictions for desired stocks
     for _, stock in enumerate(stocks):
-        print(f"Predicting future prices for \"{stock}\"")
+        stock = stock.replace('.', '-')
+        sys.stdout.write('\rPredicting prices for: %s' % stock.ljust(4))
 
-        predictions = torch.rand(1,0,5)
+        predictions = torch.rand(1,0,5)   # tensor to store future predictions
 
         data = pd.read_csv(freq + '_prices/' + stock + '.csv', index_col=0)
-        x = data[['Open', 'High', 'Low', 'Volume', 'Close']]    # input data
+        x = data[['Open', 'High', 'Low', 'Volume', 'Close']]   # input data
 
-        mins, maxs = x.min(), x.max()                           # values for normalization
+        mins, maxs = x.min(), x.max()   # values for normalization
 
         x = (x-mins)/(maxs-mins)
-
         x = torch.tensor(x.values)
         x = torch.unsqueeze(x, dim=0)
         
@@ -63,19 +63,21 @@ def predict(args):
         maxs = torch.tensor(maxs.values)
 
         for _ in range(steps):
-            pred = model(x.float())                         # model prediction for one time step
+            pred = model(x.float())   # model prediction for one time step
             pred = torch.unsqueeze(pred, dim=0)
             
-            predictions = torch.cat((predictions, pred), dim=1)    # append predicition to predictions tensor
+            predictions = torch.cat((predictions, pred), dim=1)   # append predicition to full predictions tensor
 
-            x = torch.cat((x, pred), dim=1)                        # append predicition to input data for next time step
+            x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
 
         predictions = predictions*(maxs-mins)+mins
         predictions = pd.DataFrame(predictions.squeeze().detach().numpy(), columns=['Open', 'High', 'Low', 'Volume', 'Close'])
-        predictions.to_csv(os.path.join(newpath, stock))
+        predictions.to_csv(os.path.join(newpath, stock + '.csv'), index = False)
 
+        sys.stdout.write('\rPredicting prices for: %s - DONE' % stock.ljust(4))
+
+    sys.stdout.flush()
     print(f"\nAll predictions saved to \"{newpath}\"")
-
 
 
 def parse_args():
@@ -95,7 +97,6 @@ def parse_args():
 
     args = parser.parse_args()
     return args
-
 
 
 if __name__ == "__main__":
