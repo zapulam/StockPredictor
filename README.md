@@ -1,10 +1,10 @@
 # Stock Predictor
 This repo contains Python code and notebooks which can be used to train deep learning models to predict future stock prices. Currently, either an LSTM or GRU recurrent neural network can be trained and used. In the future, I hope to add functionality to train and use a time-series forcasting transformer.
 
-## Scraping
+### Scraping
 S&P 500 data can be scraped using both the *utils/get_info.py* and *utils/get_data.py* files. By first running *get_info.py*, the names and tickers of all S&P 500 companies will be craped and saved in *S&P500-Info.csv*. Next, *get_data.py* can be run to get the past 5 years data for all S&P 500 companies on ither a monthly, weekly, or daily basis. While all of this data is present in the repo for all frequencies, it is impotant to update the data when running future predictions. 
 
-## Training 
+### Training 
 Currently, either an LSTM or GRU can be trained using the *train_rnn.py* file. Important hyperparameters are explained below...
 
 - model: LSTM or GRU
@@ -21,7 +21,7 @@ Training works as follows...
 3. The batch of sequences are then trained on. 
 4. The model is then validated using a validation set.
 
-## Prediction
+### Prediction
 Predictions for RNNs are created using the *predict_rnn.py* file. Predictions can be made and saved for all S&P 500 stocks or a select few. Important hyperparameters are as follows...
 
 - model: LSTM or GRU
@@ -36,5 +36,5 @@ Predictions are created as follows...
 2. Pass the full data through the model
 3. Save the predictions
 
-## Analysis
+### Analysis
 The predictions can then be analyzed using the *analyze.py* file.
