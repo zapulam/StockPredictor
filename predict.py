@@ -199,7 +199,6 @@ def predict(args):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--freq', type=str, choices=['daily', 'weekly', 'monthly'], default='daily', help='Predict daily, weekly, or monthly')
-    parser.add_argument('--stocks', nargs='+', help='Stocks to predict', required=True)
 
     parser.add_argument('--model', type=str, choices=['LSTM', 'GRU'], help='Model to be used')
     parser.add_argument('--weights', type=str, help='Path to model weights')
@@ -207,6 +206,7 @@ def parse_args():
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:n or cpu')
 
     parser.add_argument('--steps', type=int, default=25, help='Future time steps to predict')
+    parser.add_argument('--stocks', nargs='+', help='Stocks to predict', required=True)
 
     args = parser.parse_args()
     return args
