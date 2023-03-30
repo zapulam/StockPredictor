@@ -1,7 +1,6 @@
 # Combine past data and predictions
 # Analyze to see what stocks will be top performers
 import os
-import torch
 import argparse
 import pandas as pd
 
