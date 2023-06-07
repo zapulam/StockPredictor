@@ -1,4 +1,5 @@
 import os
+import sys
 import requests
 import argparse
 import pandas as pd
@@ -26,15 +27,16 @@ def get_data(args):
     symbols = df['Symbol'].tolist()
 
     for symbol in symbols:
-        print('Getting data for: ' + symbol, end=' ')
+        sys.stdout.write('\rGetting data for: %s' % symbol.ljust(4))
         if '.' in symbol:
             symbol = symbol.replace('.', '-')
         get = requests.get(url.format(x=symbol))
         if get.status_code != 404:
             data = pd.read_csv(url.format(x=symbol))
-            data.to_csv(os.path.join(dir, symbol + '.csv'))
-        print('- DONE')
+            data.to_csv(os.path.join(dir, symbol + '.csv'), index = False)
+        sys.stdout.write('\rGetting data for: %s - DONE' % symbol.ljust(4))
 
+    sys.stdout.write('')
     print('All stock historical price files saved to ' + folder, end='\n')
     
     
