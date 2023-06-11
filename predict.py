@@ -20,7 +20,7 @@ def predict(args):
     if not skip:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
 
-        url = 'https://query1.finance.yahoo.com/v7/finance/download/{x}?period1=1528329600&period2=1686096000&interval=1d&events=history&includeAdjustedClose=true'
+        url = 'https://query1.finance.yahoo.com/v7/finance/download/{x}?period1=1528675200&period2=1686441600&interval=1d&events=history&includeAdjustedClose=true'
 
         # Update stock data to most recent
         for symbol in symbols:
