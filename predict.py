@@ -5,6 +5,8 @@ import requests
 import argparse
 import pandas as pd
 
+from datetime import date
+
 from rnn import LSTM
 
 
@@ -20,7 +22,7 @@ def predict(args):
 
         url = 'https://query1.finance.yahoo.com/v7/finance/download/{x}?period1=1528329600&period2=1686096000&interval=1d&events=history&includeAdjustedClose=true'
 
-        # Update stock data to morst recent
+        # Update stock data to most recent
         for symbol in symbols:
             sys.stdout.write('\rGetting data for: %s' % symbol.ljust(4))
             if '.' in symbol:
@@ -85,10 +87,10 @@ def predict(args):
             x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
 
         predictions = predictions*(maxs-mins)+mins
-        predictions = pd.DataFrame(predictions.squeeze().detach().numpy(), columns=['Open', 'High', 'Low', 'Volume', 'Close'])
+        predictions = pd.DataFrame(predictions.cpu().squeeze().detach().numpy(), columns=['Open', 'High', 'Low', 'Volume', 'Close'])
         predictions.to_csv(os.path.join(newpath, stock + '.csv'), index = False)
 
-        sys.stdout.write('\rPredicting prices for: %s - DONE' % stock.ljust(4))
+        sys.stdout.write('\rPredicting prices for: %s - DONE' % stock.ljust(5))
 
     sys.stdout.flush()
     print(f"\nAll predictions saved to \"{newpath}\"")
@@ -104,7 +106,7 @@ def parse_args():
 
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:n or cpu')
 
-    parser.add_argument('--savepath', type=str, help='Path to save predictions')
+    parser.add_argument('--savepath', type=str, default=str(date.today()), help='Path to save predictions')
 
     args = parser.parse_args()
     return args
