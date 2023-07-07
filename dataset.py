@@ -55,3 +55,4 @@ class SP_500(Dataset):
         maxs = torch.tensor(maxs.values)
 
         return x, mins, maxs
+    
