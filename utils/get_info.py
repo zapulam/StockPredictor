@@ -1,4 +1,4 @@
-""" Purpose: creates csv file with info on all S&P 500 stocks, including ticker symbols"""
+""" Purpose: creates csv file with info on all S&P 500 stocks, including ticker symbols """
 
 import ssl
 import argparse

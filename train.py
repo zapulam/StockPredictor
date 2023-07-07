@@ -1,3 +1,5 @@
+""" Purpose: trains PyTorch LSTM on S&P 500 daily price data """
+
 import os
 import time
 import torch
