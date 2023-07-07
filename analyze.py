@@ -1,5 +1,5 @@
-# Combine past data and predictions
-# Analyze to see what stocks will be top performers
+""" Purpose: combine historical data and predictions to see what stocks will be top performers in the future """
+
 import os
 import argparse
 import pandas as pd
@@ -49,7 +49,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--freq', type=str, choices=['daily', 'weekly', 'monthly'], default='daily', help='Predict daily, weekly, or monthly')
     parser.add_argument('--path', type=str, help='Path to predictions folder')
-    parser.add_argument('--top', type=int, default=25, help='Top n% stocks to show in analysis')
+    parser.add_argument('--top', type=int, default=50, help='Top n% stocks to show in analysis')
 
     args = parser.parse_args()
     return args
@@ -59,3 +59,4 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     analyze(args)
+    
