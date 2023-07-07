@@ -1,3 +1,5 @@
+""" Purpose: downloads daily historical data for all S&P 500 stocks """
+
 import os
 import sys
 import requests
@@ -8,7 +10,9 @@ import pandas as pd
 def get_data(args):
     info, folder = args.info, 'daily_prices'
 
-    url = 'https://query1.finance.yahoo.com/v7/finance/download/{x}?period1=1513036800&period2=1670803200&interval=1d&events=history&includeAdjustedClose=true'
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
+
+    url = 'https://query1.finance.yahoo.com/v7/finance/download/{x}?period1=1528675200&period2=1686441600&interval=1d&events=history&includeAdjustedClose=true'
 
     dir = os.getcwd()
     dir = dir.split(os.sep)
@@ -22,14 +26,13 @@ def get_data(args):
         sys.stdout.write('\rGetting data for: %s' % symbol.ljust(4))
         if '.' in symbol:
             symbol = symbol.replace('.', '-')
-        get = requests.get(url.format(x=symbol))
+        get = requests.get(url.format(x=symbol), headers=headers)
         if get.status_code != 404:
             data = pd.read_csv(url.format(x=symbol))
             data.to_csv(os.path.join(dir, symbol + '.csv'), index = False)
-        sys.stdout.write('\rGetting data for: %s - DONE' % symbol.ljust(4))
+        sys.stdout.write('\rGetting data for: %s - DONE' % symbol.ljust(5))
 
-    sys.stdout.write('')
-    print('All stock historical price files saved to ' + folder, end='\n')
+    sys.stdout.write('\rAll stock historical price files saved to daily_prices')
     
     
 def parse_args():
@@ -42,3 +45,4 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     get_data(args)
+    
