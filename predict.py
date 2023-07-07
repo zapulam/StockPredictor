@@ -1,3 +1,5 @@
+""" Purpose: predicts stock prices n days in the future for all S&P 500 stocks """
+
 import os
 import sys
 import torch
@@ -100,7 +102,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, default='models/rnn/weights/best.pth', help='Path to model weights')
 
-    parser.add_argument('--skip', action='store_true', help='Skip data download')
+    parser.add_argument('--skip', action='store_true', help='Skip most recent daily data download')
 
     parser.add_argument('--steps', type=int, default=25, help='Future time steps to predict')
 
@@ -118,3 +120,4 @@ if __name__ == "__main__":
 
     args = parse_args()
     predict(args)
+    

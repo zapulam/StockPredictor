@@ -1,3 +1,5 @@
+""" Purpose: downloads daily historical data for all S&P 500 stocks """
+
 import os
 import sys
 import requests
@@ -30,8 +32,7 @@ def get_data(args):
             data.to_csv(os.path.join(dir, symbol + '.csv'), index = False)
         sys.stdout.write('\rGetting data for: %s - DONE' % symbol.ljust(5))
 
-    sys.stdout.write('')
-    print('All stock historical price files saved to ' + folder, end='\n')
+    sys.stdout.write('\rAll stock historical price files saved to daily_prices')
     
     
 def parse_args():
@@ -44,3 +45,4 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     get_data(args)
+    

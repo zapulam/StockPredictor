@@ -1,6 +1,7 @@
+""" Purpose: contains PyTorch LSTM model class """
+
 import torch
 import torch.nn as nn 
-
 
 
 class LSTM(nn.Module):
