@@ -13,6 +13,7 @@ class SP_500(Dataset):
         self.data = []
 
         all_files = os.listdir(folder)
+        if '_.txt' in all_files: all_files.remove('_.txt')
         files = []
 
         # set max file length ( 5 years worth of data )
