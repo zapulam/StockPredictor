@@ -8,6 +8,15 @@ import pandas as pd
 
 
 def sort(sub_li):
+    '''
+    Sorts through all predictions
+    
+    Inputs:
+    : sub_li (list[stock (str), p_change (float), change (float)]) - list of stocks with their corresponding predicted percentage change and total change
+    
+    Outpts:
+    : sub_li(list[stock (str), p_change (float), change (float)]) - sroted sub_li
+    '''
     l = len(sub_li)
     for i in range(0, l):
         for j in range(0, l-i-1):
