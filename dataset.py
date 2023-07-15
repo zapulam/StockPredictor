@@ -18,13 +18,14 @@ class SP_500(Dataset):
         Constructor method
         '''
         self.data = []
+        self.folder = folder
 
         all_files = os.listdir(folder)
         if '_.txt' in all_files: all_files.remove('_.txt')
         files = []
 
         # set max file length ( 5 years worth of data )
-        max = 1259
+        max = 1257
 
         # remove files with less than 5 years of data
         for file in all_files:
@@ -34,7 +35,7 @@ class SP_500(Dataset):
 
         # create list of files: [A.csv, AAL.csv, ...]
         for file in files:
-            self.data.append([file])
+            self.data.append(file)
 
 
     def __len__(self):
@@ -62,7 +63,7 @@ class SP_500(Dataset):
         '''
 
         # cvs to read from
-        file = self.data[idx][0]  
+        file = self.data[idx]
         data = pd.read_csv(os.path.join(self.folder, file), index_col=0)
 
         # input data
