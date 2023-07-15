@@ -1,4 +1,6 @@
-""" Purpose: contains S&P 500 dataset class used for training """
+'''
+Purpose: contains S&P 500 dataset class used for training
+'''
 
 import os
 import torch
@@ -8,8 +10,13 @@ from torch.utils.data import Dataset
 
 
 class SP_500(Dataset):
+    '''
+    S&P 500 Dataset for training RNN to predict future close prices
+    '''
     def __init__(self, folder):
-
+        '''
+        Constructor method
+        '''
         self.data = []
 
         all_files = os.listdir(folder)
@@ -31,10 +38,28 @@ class SP_500(Dataset):
 
 
     def __len__(self):
-        return len(self.data)
+        '''
+        Returns length of dataset
+        
+        Outputs:
+        : length (int) - length of dataset
+        '''
+        length = len(self.data)
+        return length
 
 
     def __getitem__(self, idx):
+        '''
+        Gets individual stock history for training 
+
+        Inputs:
+        : idx (int) - index to refernece from self.data
+
+        Outputs:
+        : x (tensor) - training input data
+        : mins (tensor) - minimum values for all input features
+        : maxs (tensor) - maximum values for all input features
+        '''
 
         # cvs to read from
         file = self.data[idx][0]  

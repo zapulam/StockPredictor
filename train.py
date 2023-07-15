@@ -1,4 +1,6 @@
-""" Purpose: trains PyTorch LSTM on S&P 500 daily price data """
+'''
+Purpose: trains PyTorch LSTM on S&P 500 daily price data
+'''
 
 import os
 import time
@@ -9,12 +11,28 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 
-from dataset import SP_500
 from rnn import LSTM
+from dataset import SP_500
 
 
 
 def train(args):
+    '''
+    Trains RNN on S&P 500 daily stock prices data to predict future close price and saves model to specified path
+
+    Inputs:
+    : args (dict) - arguments passed in via argparser
+        : hidden (int) - number of hidden layers
+        : layers (int) - number of recurrent layers
+        : data (str) - path to prices data
+        : epochs (int) - number of training epochs
+        : lr (float) - learning rate
+        : bs (int) - batch size
+        : workers (int) - number of worker nodes
+        : lookback (int) - minimum lookback range for historical data
+        : device (str) - device to use for trainng
+        : savepath (str) - path to save model
+    '''
     hidden_dim, num_layers, folder, epochs, \
         lr, bs, workers, lookback, device, savepath = \
         args.hidden, args.layers, args.data, args.epochs, \
@@ -147,6 +165,22 @@ def train(args):
 
 
 def parse_args():
+    '''
+    Saves cmd line arguments for training
+    
+    Outputs:
+    : args (dict) - cmd line aruments for training
+        : hidden (int) - number of hidden layers
+        : layers (int) - number of recurrent layers
+        : data (str) - path to prices data
+        : epochs (int) - number of training epochs
+        : lr (float) - learning rate
+        : bs (int) - batch size
+        : workers (int) - number of worker nodes
+        : lookback (int) - minimum lookback range for historical data
+        : device (str) - device to use for trainng
+        : savepath (str) - path to save model
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden', type=int, default=32, help='Number of features in hidden state')
     parser.add_argument('--layers', type=int, default=2, help='Number of recurrent layers')

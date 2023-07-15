@@ -1,4 +1,6 @@
-""" Purpose: combine historical data and predictions to see what stocks will be top performers in the future """
+'''
+Purpose: combine historical data and predictions to see what stocks will be top performers in the future
+'''
 
 import os
 import argparse
@@ -17,7 +19,15 @@ def sort(sub_li):
 
 
 def analyze(args):
-    freq, path, top = args.freq, args.path, args.top
+    '''
+    Combine historical data and predictions to see what stocks will be top performers in the future
+    
+    Inputs:
+    : args (dict) - arguments passed in via argparser
+        : path (str) - path to save location
+        : top (int) - number of top performers to return
+    '''
+    path, top = args.path, args.top
 
     changes = []
 
@@ -26,7 +36,7 @@ def analyze(args):
 
         predictions = pd.read_csv(os.path.join(path, file))
         steps = len(predictions.index)
-        data = pd.read_csv(os.path.join(freq + '_prices', stock + '.csv')).drop(columns=['Date', 'Adj Close'])
+        data = pd.read_csv(os.path.join('daily_prices', stock + '.csv')).drop(columns=['Date', 'Adj Close'])
 
         all_data = pd.concat([data, predictions], ignore_index=True)
 
@@ -46,8 +56,15 @@ def analyze(args):
 
 
 def parse_args():
+    '''
+    Saves cmd line arguments for training
+    
+    Outputs:
+    : args (dict) - cmd line aruments for training
+        : path (str) - path to save location
+        : top (int) - number of top performers to return
+    '''
     parser = argparse.ArgumentParser()
-    parser.add_argument('--freq', type=str, choices=['daily', 'weekly', 'monthly'], default='daily', help='Predict daily, weekly, or monthly')
     parser.add_argument('--path', type=str, help='Path to predictions folder')
     parser.add_argument('--top', type=int, default=50, help='Top n% stocks to show in analysis')
 

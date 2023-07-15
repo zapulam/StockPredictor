@@ -1,4 +1,6 @@
-""" Purpose: predicts stock prices n days in the future for all S&P 500 stocks """
+'''
+Purpose: predicts stock prices n days in the future for all S&P 500 stocks
+'''
 
 import os
 import sys
@@ -6,13 +8,26 @@ import torch
 import requests
 import argparse
 import pandas as pd
+import datetime as dt
 
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 from rnn import LSTM
 
 
 def predict(args):
+    '''
+    Predicts stock prices n days in the future for all S&P 500 stocks and saves predictions to specified location
+    
+    Inputs:
+    : args (dict) - arguments passed in via argparser
+        : weights (str) - path to model weights
+        : skip (bool) - skip most recent daily data download
+        : steps (int) - future time steps to predict
+        : device (str) - device to use for prediction
+        : savepath (str) - path to save predictions
+    '''
     weights, skip, steps, device, savepath = \
         args.weights, args.skip, args.steps, args.device, args.savepath
 
@@ -20,18 +35,27 @@ def predict(args):
     symbols = df['Symbol'].tolist()
     
     if not skip:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # This is chrome, you can set whatever browser you like
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # this is chrome, you can set whatever browser you like
 
-        url = 'https://query1.finance.yahoo.com/v7/finance/download/{x}?period1=1528675200&period2=1686441600&interval=1d&events=history&includeAdjustedClose=true'
+        now = dt.datetime.now()
+
+        a = dt.datetime(1970,1,1,23,59,59)
+        b = dt.datetime(now.year, now.month, now.day, 23, 59, 59)
+        c = b - relativedelta(years=5)
+
+        period1 = str(int((c-a).total_seconds()))   # total seconds from today since Jan. 1, 1970 subracting 5 years
+        period2 = str(int((b-a).total_seconds()))   # total seconds from today since Jan. 1, 1970
+
+        url = 'https://query1.finance.yahoo.com/v7/finance/download/{stock}?period1={period1}&period2={period2}&interval=1d&events=history&includeAdjustedClose=true'
 
         # Update stock data to most recent
         for symbol in symbols:
             sys.stdout.write('\rGetting data for: %s' % symbol.ljust(4))
             if '.' in symbol:
                 symbol = symbol.replace('.', '-')
-            get = requests.get(url.format(x=symbol), headers=headers)
+            get = requests.get(url.format(stock=symbol, period1=period1, period2=period2), headers=headers)
             if get.status_code != 404 & get.status_code != 400:
-                data = pd.read_csv(url.format(x=symbol))
+                data = pd.read_csv(url.format(stock=symbol, period1=period1, period2=period2))
                 data.to_csv(os.path.join('daily_prices', symbol + '.csv'), index = False)
                 sys.stdout.write('\rGetting data for: %s - DONE' % symbol.ljust(4))
 
@@ -99,6 +123,17 @@ def predict(args):
 
 
 def parse_args():
+    '''
+    Saves cmd line arguments for training
+    
+    Outputs:
+    : args (dict) - cmd line aruments for training
+        : weights (str) - path to model weights
+        : skip (bool) - skip most recent daily data download
+        : steps (int) - future time steps to predict
+        : device (str) - device to use for prediction
+        : savepath (str) - path to save predictions
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, default='models/rnn/weights/best.pth', help='Path to model weights')
 
