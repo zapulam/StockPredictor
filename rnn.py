@@ -37,3 +37,4 @@ class LSTM(nn.Module):
         out, (hn, cn) = self.lstm(x, (h0.detach(), c0.detach()))
         out = self.fc(out[:, -1, :]) 
         return out
+    
