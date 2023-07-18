@@ -31,7 +31,7 @@ def get_info(args):
     
 def parse_args():
     '''
-    Saves cmd line arguments for training
+    Saves cmd line arguments for training, should be ran with utils as cwd
     
     Outputs:
     : args (dict) - cmd line aruments for training
