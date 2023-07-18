@@ -54,6 +54,10 @@ def train(args):
 
     print(f"\n--> Created folder \"{newpath}\"")
 
+    # Create Logging file
+    with open(os.path.join(newpath, 'logs.txt'), 'a') as f:
+        f.write('Time, TrainLoss, TrainAcc, ValidLoss, ValidAcc\n')
+
     # Load data
     dataset = SP_500(folder)
     train, val = train_test_split(dataset, test_size=0.1, random_state=42)
@@ -154,11 +158,16 @@ def train(args):
             best = avg_v_loss
             torch.save([model.kwargs, model.state_dict()], os.path.join(newpath, "weights\\best.pth"))
 
+        # Print logging
         print(f"Time: {round(end-start, 3)}   ", end="")
         print(f"Train Loss: {round(avg_t_loss, 5)}   ", end="")
         print(f"Train Acc: {round(avg_t_acc, 5)}   ", end="")
         print(f"Valid Loss: {round(avg_v_loss, 5)}   ", end="")
         print(f"Valid Acc: {round(avg_v_acc, 5)}   ", end="\n")
+
+        # Logging
+        with open(os.path.join(newpath, 'logs.txt'), 'a') as f:
+            f.write(f"{round(end-start, 3)}, {round(avg_t_loss, 5)}, {round(avg_t_acc, 5)}, {round(avg_v_loss, 5)}, {round(avg_v_acc, 5)}\n")
         
     print(f'\nFinished Training - Models and metrics saved to: \"{newpath}\"')
 
