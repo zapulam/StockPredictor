@@ -1,4 +1,4 @@
-# 💸 Stock Predictor 💸 - Authored by Zachary Pulliam ☕
+# 💸 **Stock Predictor** 💸 - *Zachary Pulliam* ☕
 
 This repo contains Python 🐍 code and notebooks which can be used to train deep learning models to predict future stock prices! 📈
 
