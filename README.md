@@ -36,6 +36,16 @@ Once Anaconda is downloaded, an environment can be set up using the following co
 
     The environment is now ready to use!
 
+## Tutorial
+
+Using the *tutorial.ipynb* Jupyter Notebook, the existing RNN in the repo can be used to make predictions for stocks of your choice, simply add them to the list at the top of the file and run the code blocks to create predictions.
+
+```bash
+symbols = ['AAPL', 'AMZN']
+```
+
+The Python code will automatically pull the most recent stock data for the stocks listed and then predict *n* time steps out. The predictions are then plotted along with the historical data, with the predictions in red and the historical data in red.
+
 ## Scraping
 
 S&P 500 data can be scraped using both the files in the *utils/* folder. By first running the following command...
@@ -51,10 +61,6 @@ python get_data.py
 ```
 
 ... will get the past 5 years data for all S&P 500 stocks. Currently, in order to get the most recent data.
-
-## Tutorial
-
-Using the *tutorial.ipynb* Jupyter Notebook, the existing RNN in the repo can be used to make predictions for stocks of your choice, simply add them to the list at the top of the file and run the code blocks to create predictions.
 
 ## Training
 
