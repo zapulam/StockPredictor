@@ -58,7 +58,7 @@ def analyze(args):
         changes.append([stock, p_change, change])
 
     changes = sort(changes)
-    print("\nPredicted Top", top, "stock price increases...\n")
+    print("\nPredicted Top", top, "stock price increases over x days...\n")
 
     for i in range(top):
         print(changes[i][0].ljust(5), '-   % Change: ', str(round(changes[i][1],3)).ljust(9), '   Total Change: ', str(round(changes[i][2],3)).ljust(9))

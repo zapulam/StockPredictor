@@ -1,6 +1,6 @@
-# Stock Predictor - Authored by Zachary Pulliam
+# 💸 Stock Predictor 💸 - Authored by Zachary Pulliam ☕
 
-This repo contains Python code and notebooks which can be used to train deep learning models to predict future stock prices.
+This repo contains Python 🐍 code and notebooks which can be used to train deep learning models to predict future stock prices! 📈
 
 ## Setup
 
@@ -117,4 +117,26 @@ Prediction works as follows...
 
 ## Analysis
 
-The predictions can then be analyzed using the *analyze.py* file.
+After predictions are made using the *predict.py* script, the predictions can then be analyzed using the *analyze.py* file. This can be done using the following command...
+
+```bash
+python anaylze.py --path predictions/date
+```
+
+...where date corresponds to the date that the prediction script was originally run. The analysis will concatenate the historical data with the predicitons data and then sort the stocks by the percent change between the most recent day in the historical data and the last day in the predictions data. The results are then printed to the command line in the following form...
+
+```bash
+Predicted Top 5 stock price increases...
+
+CZR   -   % Change:  72.802       Total Change:  38.199
+GM    -   % Change:  64.054       Total Change:  24.821
+COF   -   % Change:  60.248       Total Change:  68.339
+EXPE  -   % Change:  59.907       Total Change:  72.571
+EMN   -   % Change:  53.395       Total Change:  46.192
+```
+
+...this is an example output of the script for predicitons made on 2023-07-18 for 25 days out.
+
+## Disclaimer
+
+While the model in this repo have been trained directly on S&P 500 stock data, the predictions produced by this model and any other model trained via the code in this repo should not be used primarily to make financial decisions. 😄
