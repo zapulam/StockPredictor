@@ -52,6 +52,10 @@ python get_data.py
 
 ... will get the past 5 years data for all S&P 500 stocks. Currently, in order to get the most recent data.
 
+## Tutorial
+
+Using the *tutorial.ipynb* Jupyter Notebook, the existing RNN in the repo can be used to make predictions for stocks of your choice, simply add them to the list at the top of the file and run the code blocks to create predictions.
+
 ## Training
 
 An LSTM can be trained using the *train.py* file using the following command...
