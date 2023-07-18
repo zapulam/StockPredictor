@@ -72,7 +72,7 @@ def predict(args):
     print(f"\n--> Created folder \"{newpath}\"")
 
     # Load model
-    kwargs, state = torch.load(weights)
+    kwargs, state = torch.load(weights, map_location=torch.device(device))
     model = LSTM(**kwargs)
     model.load_state_dict(state)
     model.to(device)
