@@ -38,10 +38,12 @@ Once Anaconda is downloaded, an environment can be set up using the following co
 
 ## Tutorial
 
-Using the *tutorial.ipynb* Jupyter Notebook, the existing RNN in the repo can be used to make predictions for stocks of your choice, simply add them to the list at the top of the file and run the code blocks to create predictions.
+Using the *tutorial.ipynb* Jupyter Notebook, the existing RNN in the repo can be used to make predictions for stocks of your choice, simply add them to the list at the top of the file and run the code blocks to create predictions. By changing the value of *steps* you can adjust how many days in advance the model will predict. The variable device should be set to *cuda:n* if a GPU is available and *cpu* if not. The code block is shown below...
 
 ```bash
-symbols = ['AAPL', 'AMZN']
+symbols = ['AAPL', 'AMZN']      # stocks to make predictions for
+device = 'cuda:0'               # device to use; cuda or cpu
+steps = 25                      # future time steps to predict for
 ```
 
 The Python code will automatically pull the most recent stock data for the stocks listed and then predict *n* time steps out. The predictions are then plotted along with the historical data, with the predictions in red and the historical data in red.
