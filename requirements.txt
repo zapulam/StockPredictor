@@ -1,0 +1,34 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: win-64
+cudatoolkit=11.3.1=h59b6b97_2
+ipykernel=6.4.1=py39haa95532_1
+ipython=7.31.1=py39haa95532_0
+ipython_genutils=0.2.0=pyhd3eb1b0_1
+jupyter_client=7.1.2=pyhd3eb1b0_0
+jupyter_core=4.9.1=py39haa95532_0
+jupyter_server=1.13.5=pyhd3eb1b0_0
+jupyterlab=3.2.1=pyhd3eb1b0_1
+jupyterlab_pygments=0.1.2=py_0
+jupyterlab_server=2.10.3=pyhd3eb1b0_1
+matplotlib=3.5.0=py39haa95532_0
+matplotlib-base=3.5.0=py39h6214cd6_0
+matplotlib-inline=0.1.2=pyhd3eb1b0_2
+notebook=6.4.6=py39haa95532_0
+numpy=1.21.5=py39ha4e8547_0
+numpy-base=1.21.5=py39hc2deb75_0
+openssl=1.1.1s=h2bbff1b_0
+pandas=1.3.5=py39h6214cd6_0
+path=16.4.0=pypi_0
+pip=21.2.4=py39haa95532_0
+python=3.9.7=h6244533_1
+python-dateutil=2.8.2=pyhd3eb1b0_0
+python_abi=3.9=2_cp39
+regex=2022.3.15=py39h2bbff1b_0
+requests=2.27.1=pyhd3eb1b0_0
+scikit-image=0.19.2=py39h2e25243_0
+scikit-learn=1.0.2=pypi_0
+scipy=1.8.0=py39hc0c34ad_1
+seaborn=0.12.2=py39haa95532_0
+tqdm=4.63.0=pyhd3eb1b0_0
+urllib3=1.26.8=pyhd3eb1b0_0
