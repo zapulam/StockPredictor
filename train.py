@@ -97,7 +97,7 @@ def train(args):
 
             # Create sequences of min length lookback and max length inputs.shape[1]
             for i in range(lookback, inputs.shape[1]-1):
-                seqs.append([inputs[:, 0: lookback, :], inputs[:, lookback+1, :]])   # [inputs[bs, 0-n, feats], inputs[bs, n+1, feats]]
+                seqs.append([inputs[:, 0: i, :], inputs[:, i, :]])   # [inputs[bs, 0-n, feats], inputs[bs, n+1, feats], ...]
 
             # Train model for each sequence
             for _, seq in enumerate(seqs):
@@ -188,7 +188,7 @@ def parse_args():
     parser.add_argument('--data', type=str, default='daily_prices', help='Path to prices data')
 
     parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
-    parser.add_argument('--lr', type=float, default=0.01, help='Learning rate')
+    parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
     parser.add_argument('--bs', type=int, default=4, help='Batch size')
     parser.add_argument('--workers', type=int, default=0, help='Number of workers')
 
