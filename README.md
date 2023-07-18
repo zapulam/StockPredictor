@@ -72,7 +72,7 @@ An LSTM can be trained using the *train.py* file using the following command...
 python train.py
 ```
 
-Hyperparameters are explained below...
+Args are explained below...
 
 - hidden: number of features in hidden state
 - layers: number of recurrent layers
@@ -100,7 +100,7 @@ Predictions for RNNs are created using the *predict.py* file using the following
 python predict.py
 ```
 
-Hyperparameters are explained below...
+Args are explained below...
 
 - weights: path to model .pth file containing model weights
 - skip: if true, skips the download of most recent data
@@ -136,6 +136,11 @@ EMN   -   % Change:  53.395       Total Change:  46.192
 ```
 
 ...this is an example output of the script for predicitons made on 2023-07-18 for 25 days out.
+
+Args are explained below...
+
+- path: path to predictions folder
+- top: top *n* stocks and their corresponding changes to display
 
 ## Disclaimer
 
