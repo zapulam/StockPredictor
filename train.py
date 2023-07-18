@@ -97,7 +97,7 @@ def train(args):
 
             # Create sequences of min length lookback and max length inputs.shape[1]
             for i in range(lookback, inputs.shape[1]-1):
-                seqs.append([inputs[:, 0: i, :], inputs[:, i, :]])   # [inputs[bs, 0-n, feats], inputs[bs, n+1, feats], ...]
+                seqs.append([inputs[:, 0: i, :], inputs[:, i, :]])   # [inputs[bs, 0 to n, feats], inputs[bs, n, feats], ...]
 
             # Train model for each sequence
             for _, seq in enumerate(seqs):
