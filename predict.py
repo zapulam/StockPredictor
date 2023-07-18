@@ -57,7 +57,7 @@ def predict(args):
             if get.status_code != 404 & get.status_code != 400:
                 data = pd.read_csv(url.format(stock=symbol, period1=period1, period2=period2))
                 data.to_csv(os.path.join('daily_prices', symbol + '.csv'), index = False)
-                sys.stdout.write('\rGetting data for: %s - DONE' % symbol.ljust(4))
+                sys.stdout.write('\rGetting data for: %s - DONE' % symbol.ljust(5))
 
     # Create unique save path for predictions
     k, newpath = 2, 'predictions/' + savepath

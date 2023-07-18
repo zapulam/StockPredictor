@@ -15,7 +15,7 @@ from dateutil.relativedelta import relativedelta
 
 def get_data(args):
     '''
-    Downloads daily historical data for all S&P 500 stocks
+    Downloads daily historical data for all S&P 500 stocks, should be ran with utils as cwd
     
     Inputs:
     : args (dict) - cmd line aruments for training
@@ -41,9 +41,11 @@ def get_data(args):
     dir = os.path.join('C:\\', *dir[1:-1], folder)
     os.makedirs(dir, exist_ok=True)
 
+    # get all ticker symbols from info file
     df = pd.read_csv(info)
     symbols = df['Symbol'].tolist()
 
+    # download historical data for each stock
     for symbol in symbols:
         sys.stdout.write('\rGetting data for: %s' % symbol.ljust(4))
         if '.' in symbol:
