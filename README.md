@@ -86,7 +86,7 @@ Predictions for RNNs are created using the *predict.py* file using the following
 
 ```bash
 python predict.py
-``` 
+```
 
 Hyperparameters are explained below...
 
