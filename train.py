@@ -56,7 +56,7 @@ def train(args):
 
     # Load data
     dataset = SP_500(folder)
-    train, val = train_test_split(dataset, test_size=0.2, random_state=42)
+    train, val = train_test_split(dataset, test_size=0.1, random_state=42)
 
     # Create dataloaders
     trainloader = DataLoader(dataset=train, batch_size=bs, shuffle=True, num_workers=workers)
@@ -124,7 +124,7 @@ def train(args):
                 # Create sequences of min length lookback and max length inputs.shape[1]
                 for i in range(lookback, inputs.shape[1]-1):
                     if i + lookback < inputs.shape[1]:
-                        seqs.append([inputs[:, 0: lookback, :], inputs[:, lookback+1, :]])
+                        seqs.append([inputs[:, 0:i, :], inputs[:,i, :]])
 
                 # Validate for each sequence
                 for _, seq in enumerate(seqs):
