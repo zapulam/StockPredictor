@@ -75,7 +75,7 @@ def parse_args():
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--path', type=str, help='Path to predictions folder')
-    parser.add_argument('--top', type=int, default=50, help='Top n% stocks to show in analysis')
+    parser.add_argument('--top', type=int, default=50, help='Top n stocks to show in analysis')
 
     args = parser.parse_args()
     return args
