@@ -147,4 +147,4 @@ Args are explained below...
 
 ## Disclaimer
 
-While the model in this repo have been trained directly on S&P 500 stock data, the predictions produced by this model and any other model trained via the code in this repo should not be used primarily to make financial decisions. 😄
+While the model in this repo has been trained directly on S&P 500 stock data, the predictions produced by this model and any other model trained via the code in this repo should not be used primarily to make financial decisions. 😄
