@@ -36,6 +36,8 @@ Once Anaconda is downloaded, an environment can be set up using the following co
 
     The environment is now ready to use!
 
+When initially cloning the repository, keep in mind that the *daily_prices* folder is initially empty. Therefore, in order to begin training a new model, the *get_data.py* util script must be run. However, if you wish to use the existing model in the repo, running preditions using the *tutorial.ipynb* notebook or *predict.py* script will automatically pull down the most recent data.
+
 ## Tutorial
 
 Using the *tutorial.ipynb* Jupyter Notebook, the existing RNN in the repo can be used to make predictions for stocks of your choice, simply add them to the list at the top of the file and run the code blocks to create predictions. By changing the value of *steps* you can adjust how many days in advance the model will predict. The variable device should be set to *cuda:n* if a GPU is available and *cpu* if not. The code block is shown below...
