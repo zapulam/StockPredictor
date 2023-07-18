@@ -52,13 +52,14 @@ The Python code will automatically pull the most recent stock data for the stock
 
 ## Scraping
 
-S&P 500 data can be scraped using both the files in the *utils/* folder. By first running the following command...
+S&P 500 data can be scraped using both the files in the *utils/* folder. By first running the following commands...
 
 ```bash
-python utils/get_info.py
+cd utils
+python get_info.py
 ```
 
-... this will download the names and tickers of all S&P 500 companies from [Wikipedia](https://en.wikipedia.org/wiki/List_of_S%26P_500_companies) and will be saved in *S&P500-Info.csv*. Next, running the follwoing command...
+... this will download the names and tickers of all S&P 500 companies from [Wikipedia](https://en.wikipedia.org/wiki/List_of_S%26P_500_companies) and will be saved in *S&P500-Info.csv*. Next, running the following command also from within the utils folder...
 
 ```bash
 python get_data.py
