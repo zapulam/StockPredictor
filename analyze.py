@@ -14,8 +14,8 @@ def sort(sub_li):
     Inputs:
     : sub_li (list[stock (str), p_change (float), change (float)]) - list of stocks with their corresponding predicted percentage change and total change
     
-    Outpts:
-    : sub_li(list[stock (str), p_change (float), change (float)]) - sroted sub_li
+    Outputs:
+    : sub_li(list[stock (str), p_change (float), change (float)]) - sorted sub_li
     '''
     l = len(sub_li)
     for i in range(0, l):
@@ -58,7 +58,7 @@ def analyze(args):
         changes.append([stock, p_change, change])
 
     changes = sort(changes)
-    print("\nPredicted Top", top, "stock price increases over x days...\n")
+    print("\nPredicted Top", top, "stock price increases over X days...\n")
 
     for i in range(top):
         print(changes[i][0].ljust(5), '-   % Change: ', str(round(changes[i][1],3)).ljust(9), '   Total Change: ', str(round(changes[i][2],3)).ljust(9))
