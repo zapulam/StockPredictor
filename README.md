@@ -1,6 +1,6 @@
 # 💸 **Stock Predictor** 💸 - *Zachary Pulliam* ☕
 
-This repo contains Python 🐍 code and notebooks which can be used to train deep learning models to predict future stock prices! 📈
+This repo contains Python 🐍 code and notebooks which can be used to train deep learning models to predict future stock prices! 📈 For a basic understanding of how prediction is done, view the *tutorial.ipynb*.
 
 ## Setup
 
@@ -36,7 +36,7 @@ Once Anaconda is downloaded, an environment can be set up using the following co
 
     The environment is now ready to use!
 
-When initially cloning the repository, keep in mind that the *daily_prices* folder is initially empty. Therefore, in order to begin training a new model, the *get_data.py* util script must be run. However, if you wish to use the existing model in the repo, running preditions using the *tutorial.ipynb* notebook or *predict.py* script will automatically pull down the most recent data.
+When initially cloning the repository, keep in mind that the *daily_prices* folder is empty. Therefore, in order to begin training a new model, the *get_data.py* util script must be run. However, if you wish to use the existing model in the repo, running predictions using the *tutorial.ipynb* notebook or *predict.py* script will automatically pull down the most recent data.
 
 ## Tutorial
 
@@ -48,7 +48,7 @@ device = 'cuda:0'               # device to use; cuda or cpu
 steps = 25                      # future time steps to predict for
 ```
 
-The Python code will automatically pull the most recent stock data for the stocks listed and then predict *n* time steps out. The predictions are then plotted along with the historical data, with the predictions in red and the historical data in red.
+The Python code will automatically pull the most recent stock data for the stocks listed and then predict *n* time steps out. The predictions are then plotted along with the historical data, with the predictions in red and the historical data in blue.
 
 ## Scraping
 
@@ -66,6 +66,24 @@ python get_data.py
 ```
 
 ... will get the past 5 years data for all S&P 500 stocks. Currently, in order to get the most recent data.
+
+## Dataset
+
+The dataset which is trained on is located in the *dataset.py* file. The dataset class is built upon PyTorch's Dataset class and makes use of its *__init__*, *__len__*, and *__getitem__* functions. In the constructor, a list of all *csv* files located in the *daily_prices* folder is created. Each of these files contains 5 years worth of data on an individual stock with the following features...
+
+- Date
+- Open
+- High
+- Low
+- Close
+- Adj Close
+- Volume
+
+When the *__getitem__* function is called via PyTorch's DataLoader class, the *csv* file is read into a Pandas DataFrame and the *Open*, *High*, *Low*, *Volume*, and *Close* features are kept and normalized. The normalized input features are returned along with the values used for normalization.
+
+## Model
+
+The LSTM model is defined in the *rnn.py* file. The model has only two functions, the *__init__* constructor and the **forward** method. The constructor simply defines the model with a PyTorch LSTM base and a final linear layer. The forward method is used to pass data through the model; first the LSTM layer, then the linear layer.
 
 ## Training
 
@@ -90,8 +108,8 @@ Args are explained below...
 
 Training works as follows...
 
-1. A batch of data including *n* tensors including 5 years worth of data on Low, High, open, and Close prices are loaded.
-2. The data for each stock is split into sequences from the length of the desired minimum lookback all the way to the full 5 years worth of data. For instances if the length of the data is 60 rows and minimum lookback is 50, 10 sequences will be created.
+1. A batch of data including *n* tensors with 5 years worth of data on Low, High, open, and Close prices are loaded.
+2. The data for each stock is split into sequences from the length of the desired minimum lookback all the way to the full 5 years worth of data. For instance, if the length of the data is 60 rows and minimum lookback is 50, 10 sequences will be created, ranging in length from 50 to 59 data points.
 3. The batch of sequences are then trained on.
 4. The model is then validated using a validation set.
 
@@ -126,7 +144,7 @@ After predictions are made using the *predict.py* script, the predictions can th
 python anaylze.py --path predictions/date
 ```
 
-...where date corresponds to the date that the prediction script was originally run. The analysis will concatenate the historical data with the predicitons data and then sort the stocks by the percent change between the most recent day in the historical data and the last day in the predictions data. The results are then printed to the command line in the following form...
+...where date corresponds to the date that the prediction script was originally run. The analysis will concatenate the historical data with the predictions data and then sort the stocks by the percent change between the most recent day in the historical data and the last day in the predictions data. The results are then printed to the command line in the following form...
 
 ```bash
 Predicted Top 5 stock price increases...
