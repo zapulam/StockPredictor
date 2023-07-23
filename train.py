@@ -90,7 +90,7 @@ def train(args):
         v_loss = []     # validation losses
         v_acc = []      # validation accuracy (Close)
 
-        # For each batch in the dataloader
+        # Training
         for _, data in enumerate(tqdm(trainloader, desc='Training', ascii=True, bar_format='{l_bar}{bar:50}{r_bar}{bar:-50b}')):
             inputs = data[0]
 
@@ -105,19 +105,20 @@ def train(args):
 
             # Train model for each sequence
             for _, seq in enumerate(seqs):
-                predictions = torch.rand(1,0,5)   # tensor to store future predictions
+                predictions = torch.rand(bs,0,5).cuda()   # tensor to store future predictions
 
                 x = seq[0].float()   # get inputs from seq
+                y = seq[1].float()   # get ground truth from seq
 
                 for _ in range(lookahead):
-                    pred = model(inputs)   # model prediction for one time step
-                    pred = torch.unsqueeze(pred, dim=0)
+                    pred = model(x)   # model prediction for one time step
+                    pred = torch.unsqueeze(pred, dim=1)
                     
                     predictions = torch.cat((predictions, pred), dim=1)   # append predicition to full predictions tensor
 
                     x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
 
-                loss = criterion(predictions, seq[1].float())
+                loss = criterion(predictions, y)
 
                 t_loss.append(loss.item())
                 t_acc.extend((1 - torch.abs(predictions[:, -1, 4] - seq[1][:, -1, 4])).tolist())   # checking accuracy of close on last day... lookahead days out
@@ -139,15 +140,25 @@ def train(args):
                     if i + lookback < inputs.shape[1]:
                         seqs.append([inputs[:, 0:i, :], inputs[:,i, :]])
 
-                # Validate for each sequence
+                # Validate model for each sequence
                 for _, seq in enumerate(seqs):
-                    pred = model(seq[0].float())
+                    predictions = torch.rand(bs,0,5)   # tensor to store future predictions
 
-                    loss = criterion(pred, seq[1].float())
+                    x = seq[0].float()   # get inputs from seq
+                    y = seq[1].float()   # get ground truth from seq
+                    
+                    for _ in range(lookahead):
+                        pred = model(x)   # model prediction for one time step
+                        pred = torch.unsqueeze(pred, dim=1)
+                        
+                        predictions = torch.cat((predictions, pred), dim=1)   # append predicition to full predictions tensor
+
+                        x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
+
+                    loss = criterion(pred, y)
 
                     v_loss.append(loss.item())
-                    v_acc.extend((1 - torch.abs(pred[:, 4] - seq[1][:, 4])).tolist())
-                    ###v_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
+                    v_acc.extend((1 - torch.abs(pred[:, 4] - seq[1][:, 4])).tolist())   # checking accuracy of close on last day... lookahead days out
 
         end = time.time()
 
@@ -207,10 +218,10 @@ def parse_args():
 
     parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
-    parser.add_argument('--bs', type=int, default=16, help='Batch size')
+    parser.add_argument('--bs', type=int, default=32, help='Batch size')
     parser.add_argument('--workers', type=int, default=0, help='Number of workers')
 
-    parser.add_argument('--lookback', type=int, default=60, help='Specify min lookback range')
+    parser.add_argument('--lookback', type=int, default=252, help='Specify min lookback range')
     parser.add_argument('--lookahead', type=int, default=5, help='Specify lookahead range')
 
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:n or cpu')
