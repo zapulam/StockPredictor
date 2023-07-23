@@ -220,9 +220,9 @@ def parse_args():
 
     parser.add_argument('--data', type=str, default='daily_prices', help='Path to prices data')
 
-    parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=5, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
-    parser.add_argument('--bs', type=int, default=32, help='Batch size')
+    parser.add_argument('--bs', type=int, default=16, help='Batch size')
     parser.add_argument('--workers', type=int, default=0, help='Number of workers')
 
     parser.add_argument('--lookback', type=int, default=252, help='Specify min lookback range')
