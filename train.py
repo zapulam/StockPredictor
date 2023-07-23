@@ -34,9 +34,9 @@ def train(args):
         : savepath (str) - path to save model
     '''
     hidden_dim, num_layers, folder, epochs, \
-        lr, bs, workers, lookback, device, savepath = \
+        lr, bs, workers, lookback, lookahead, device, savepath = \
         args.hidden, args.layers, args.data, args.epochs, \
-        args.lr, args.bs, args.workers, args.lookback, args.device, args.savepath
+        args.lr, args.bs, args.workers, args.lookback, args.lookahead, args.device, args.savepath
 
     if not os.path.isdir('models'):
         os.mkdir('models')
@@ -78,7 +78,7 @@ def train(args):
     criterion = torch.nn.MSELoss(reduction='mean')
     optimiser = torch.optim.Adam(model.parameters(), lr=lr)
 
-    best = 10000
+    best = 100
 
     print("\nBeginning training...")
     for epoch in range(epochs):
@@ -100,18 +100,27 @@ def train(args):
             seqs = []   # to be a list of [tensor(bs, 0-n, feats), tensor(bs, n+1, feats)]... [input, expected output]
 
             # Create sequences of min length lookback and max length inputs.shape[1]
-            for i in range(lookback, inputs.shape[1]-1):
-                seqs.append([inputs[:, 0:i, :], inputs[:, i, :]])   # [inputs[bs, 0 to n, feats], inputs[bs, n, feats], ...]
+            for i in range(lookback, inputs.shape[1]-lookahead):
+                seqs.append([inputs[:, 0:i, :], inputs[:, i:i+lookahead, :]])   # list like... [inputs[bs, 0 to n, feats], inputs[bs, n to lookahead, feats], ...]
 
             # Train model for each sequence
             for _, seq in enumerate(seqs):
-                pred = model(seq[0].float())
+                predictions = torch.rand(1,0,5)   # tensor to store future predictions
 
-                loss = criterion(pred, seq[1].float())
+                x = seq[0].float()   # get inputs from seq
+
+                for _ in range(lookahead):
+                    pred = model(inputs)   # model prediction for one time step
+                    pred = torch.unsqueeze(pred, dim=0)
+                    
+                    predictions = torch.cat((predictions, pred), dim=1)   # append predicition to full predictions tensor
+
+                    x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
+
+                loss = criterion(predictions, seq[1].float())
 
                 t_loss.append(loss.item())
-                t_acc.extend((1 - torch.abs(pred[:, 4] - seq[1][:, 4])).tolist())
-                ###t_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
+                t_acc.extend((1 - torch.abs(predictions[:, -1, 4] - seq[1][:, -1, 4])).tolist())   # checking accuracy of close on last day... lookahead days out
 
                 optimiser.zero_grad()
                 loss.backward()
@@ -198,10 +207,11 @@ def parse_args():
 
     parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
-    parser.add_argument('--bs', type=int, default=4, help='Batch size')
+    parser.add_argument('--bs', type=int, default=16, help='Batch size')
     parser.add_argument('--workers', type=int, default=0, help='Number of workers')
 
-    parser.add_argument('--lookback', type=int, default=60, help='Specifiy min lookback range')
+    parser.add_argument('--lookback', type=int, default=60, help='Specify min lookback range')
+    parser.add_argument('--lookahead', type=int, default=5, help='Specify lookahead range')
 
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:n or cpu')
 
