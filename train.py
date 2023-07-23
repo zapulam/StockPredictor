@@ -107,7 +107,9 @@ def train(args):
 
             # Train model for each sequence
             for _, seq in enumerate(seqs):
-                predictions = torch.rand(bs,0,5).cuda()   # tensor to store future predictions
+                predictions = torch.rand(bs,0,5)  # tensor to store future predictions
+                if 'cuda' in device:
+                    predictions = predictions.cuda()
 
                 x = seq[0].float()   # get inputs from seq
                 y = seq[1].float()   # get ground truth from seq
@@ -147,6 +149,8 @@ def train(args):
                 # Validate model for each sequence
                 for _, seq in enumerate(seqs):
                     predictions = torch.rand(bs,0,5)   # tensor to store future predictions
+                    if 'cuda' in device:
+                        predictions = predictions.cuda()
 
                     x = seq[0].float()   # get inputs from seq
                     y = seq[1].float()   # get ground truth from seq
