@@ -144,9 +144,8 @@ def train(args):
                 seqs = []   # to be a list of [tensor(bs, 0-n, feats), tensor(bs, n+1, feats)]... [input, expected output]
 
                 # Create sequences of min length lookback and max length inputs.shape[1]
-                for i in range(lookback, inputs.shape[1]-1):
-                    if i + lookback < inputs.shape[1]:
-                        seqs.append([inputs[:, 0:i, :], inputs[:,i, :]])
+                for i in range(lookback, inputs.shape[1]-lookahead):
+                    seqs.append([inputs[:, 0:i, :], inputs[:, i:i+lookahead, :]])
 
                 # Validate model for each sequence
                 for _, seq in enumerate(seqs):
@@ -167,10 +166,10 @@ def train(args):
 
                         x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
 
-                    loss = criterion(pred, y)   # calculate loss
+                    loss = criterion(predictions, y)   # calculate loss
 
                     v_loss.append(loss.item())
-                    v_acc.extend((1 - torch.abs(pred[:, 4] - seq[1][:, 4])).tolist())   # checking accuracy of close on last day... lookahead days out
+                    v_acc.extend((1 - torch.abs(predictions[:, -1, 4] - seq[1][:, -1, 4])).tolist())   # checking accuracy of close on last day... lookahead days out
 
         end = time.time()
 
