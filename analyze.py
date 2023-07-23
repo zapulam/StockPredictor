@@ -12,10 +12,10 @@ def sort(sub_li):
     Sorts through all predictions
     
     Inputs:
-    : sub_li (list[stock (str), p_change (float), change (float)]) - list of stocks with their corresponding predicted percentage change and total change
+        sub_li (list[stock (str), p_change (float), change (float)]) - list of stocks with their corresponding predicted percentage change and total change
     
     Outputs:
-    : sub_li(list[stock (str), p_change (float), change (float)]) - sorted sub_li
+        sub_li(list[stock (str), p_change (float), change (float)]) - sorted sub_li
     '''
     l = len(sub_li)
     for i in range(0, l):
@@ -32,9 +32,9 @@ def analyze(args):
     Combine historical data and predictions to see what stocks will be top performers in the future
     
     Inputs:
-    : args (dict) - arguments passed in via argparser
-        : path (str) - path to save location
-        : top (int) - number of top performers to return
+        args (dict) - arguments passed in via argparser
+            path (str) - path to save location
+            top (int) - number of top performers to return
     '''
     path, top = args.path, args.top
 
@@ -69,9 +69,9 @@ def parse_args():
     Saves cmd line arguments for training
     
     Outputs:
-    : args (dict) - cmd line aruments for training
-        : path (str) - path to save location
-        : top (int) - number of top performers to return
+        args (dict) - cmd line aruments for training
+            path (str) - path to save location
+            top (int) - number of top performers to return
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--path', type=str, help='Path to predictions folder')

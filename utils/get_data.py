@@ -18,8 +18,8 @@ def get_data(args):
     Downloads daily historical data for all S&P 500 stocks, should be ran with utils as cwd
     
     Inputs:
-    : args (dict) - cmd line aruments for training
-        : info (str) - path to S&P500-Info.csv
+        args (dict) - cmd line aruments for training
+            info (str) - path to S&P500-Info.csv
     '''
     info, folder = args.info, 'daily_prices'
 
@@ -64,8 +64,8 @@ def parse_args():
     Saves cmd line arguments for training
     
     Outputs:
-    : args (dict) - cmd line aruments for training
-        : info (str) - path to S&P500-Info.csv
+        args (dict) - cmd line aruments for training
+            info (str) - path to S&P500-Info.csv
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--info', type=str, default='S&P500-Info.csv', help='location of S&P500-Info.csv')

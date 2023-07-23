@@ -21,12 +21,12 @@ def predict(args):
     Predicts stock prices n days in the future for all S&P 500 stocks and saves predictions to specified location
     
     Inputs:
-    : args (dict) - arguments passed in via argparser
-        : weights (str) - path to model weights
-        : skip (bool) - skip most recent daily data download
-        : steps (int) - future time steps to predict
-        : device (str) - device to use for prediction
-        : savepath (str) - path to save predictions
+        args (dict) - arguments passed in via argparser
+            weights (str) - path to model weights
+            skip (bool) - skip most recent daily data download
+            steps (int) - future time steps to predict
+            device (str) - device to use for prediction
+            savepath (str) - path to save predictions
     '''
     weights, skip, steps, device, savepath = \
         args.weights, args.skip, args.steps, args.device, args.savepath
@@ -132,12 +132,12 @@ def parse_args():
     Saves cmd line arguments for training
     
     Outputs:
-    : args (dict) - cmd line aruments for training
-        : weights (str) - path to model weights
-        : skip (bool) - skip most recent daily data download
-        : steps (int) - future time steps to predict
-        : device (str) - device to use for prediction
-        : savepath (str) - path to save predictions
+        args (dict) - cmd line aruments for training
+            weights (str) - path to model weights
+            skip (bool) - skip most recent daily data download
+            steps (int) - future time steps to predict
+            device (str) - device to use for prediction
+            savepath (str) - path to save predictions
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, default='models/rnn/weights/best.pth', help='Path to model weights')
