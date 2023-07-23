@@ -22,16 +22,16 @@ def train(args):
 
     Inputs:
         args (dict) - arguments passed in via argparser
-            hidden (int) - number of hidden layers
-            layers (int) - number of recurrent layers
-            data (str) - path to prices data
-            epochs (int) - number of training epochs
-            lr (float) - learning rate
-            bs (int) - batch size
-            workers (int) - number of worker nodes
-            lookback (int) - minimum lookback range for historical data
-            device (str) - device to use for trainng
-            savepath (str) - path to save model
+            - hidden (int) - number of hidden layers.
+            - layers (int) - number of recurrent layers.
+            - data (str) - path to prices datA.
+            - epochs (int) - number of training epochs.
+            - lr (float) - learning rate.
+            - bs (int) - batch size.
+            - workers (int) - number of worker nodes.
+            - lookback (int) - minimum lookback range for historical data.
+            - device (str) - device to use for trainng.
+            - savepath (str) - path to save model.
     '''
     hidden_dim, num_layers, folder, epochs, \
         lr, bs, workers, lookback, lookahead, device, savepath = \
@@ -211,16 +211,16 @@ def parse_args():
     
     Outputs:
         args (dict) - cmd line aruments for training
-            hidden (int) - number of hidden layers
-            layers (int) - number of recurrent layers
-            data (str) - path to prices data
-            epochs (int) - number of training epochs
-            lr (float) - learning rate
-            bs (int) - batch size
-            workers (int) - number of worker nodes
-            lookback (int) - minimum lookback range for historical data
-            device (str) - device to use for trainng
-            savepath (str) - path to save model
+            - hidden (int) - number of hidden layers.
+            - layers (int) - number of recurrent layers.
+            - data (str) - path to prices data.
+            - epochs (int) - number of training epochs.
+            - lr (float) - learning rate.
+            - bs (int) - batch size.
+            - workers (int) - number of worker nodes.
+            - lookback (int) - minimum lookback range for historical data.
+            - device (str) - device to use for trainng.
+            - savepath (str) - path to save model.
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden', type=int, default=32, help='Number of features in hidden state')
