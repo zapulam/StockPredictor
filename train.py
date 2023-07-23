@@ -38,10 +38,11 @@ def train(args):
         args.hidden, args.layers, args.data, args.epochs, \
         args.lr, args.bs, args.workers, args.lookback, args.lookahead, args.device, args.savepath
 
+    # Make models folder
     if not os.path.isdir('models'):
         os.mkdir('models')
 
-    # Create unique save path
+    # Make unique model folder
     k, newpath = 2, 'models/' + savepath
     while True:
         if not os.path.isdir(newpath):
@@ -50,6 +51,8 @@ def train(args):
         else:
             newpath = 'models/' + savepath + "_" + str(k)
             k += 1
+
+    # Make weights folder
     os.mkdir(os.path.join(newpath, 'weights'))
 
     print(f"\n--> Created folder \"{newpath}\"")
@@ -81,14 +84,13 @@ def train(args):
     best = 100
 
     print("\nBeginning training...")
+
     for epoch in range(epochs):
         print(f"\nEpoch: {epoch + 1} of {epochs}")
         start = time.time()
 
-        t_loss = []     # training losses
-        t_acc = []      # training accuracy (Close)
-        v_loss = []     # validation losses
-        v_acc = []      # validation accuracy (Close)
+        t_loss, t_acc = [], []   # training losses and accuracy 
+        v_loss, v_acc = [], []   # validation losses and accuracy 
 
         # Training
         for _, data in enumerate(tqdm(trainloader, desc='Training', ascii=True, bar_format='{l_bar}{bar:50}{r_bar}{bar:-50b}')):
@@ -118,14 +120,14 @@ def train(args):
 
                     x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
 
-                loss = criterion(predictions, y)
+                loss = criterion(predictions, y)   # calculate loss
 
                 t_loss.append(loss.item())
                 t_acc.extend((1 - torch.abs(predictions[:, -1, 4] - seq[1][:, -1, 4])).tolist())   # checking accuracy of close on last day... lookahead days out
 
-                optimiser.zero_grad()
-                loss.backward()
-                optimiser.step()
+                optimiser.zero_grad()   # zero gradients
+                loss.backward()         # compute gradients
+                optimiser.step()        # update model parameters
 
         # Validation
         with torch.no_grad():
@@ -134,6 +136,8 @@ def train(args):
 
                 if 'cuda' in device:
                     inputs = inputs.cuda()
+
+                seqs = []   # to be a list of [tensor(bs, 0-n, feats), tensor(bs, n+1, feats)]... [input, expected output]
 
                 # Create sequences of min length lookback and max length inputs.shape[1]
                 for i in range(lookback, inputs.shape[1]-1):
@@ -155,7 +159,7 @@ def train(args):
 
                         x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
 
-                    loss = criterion(pred, y)
+                    loss = criterion(pred, y)   # calculate loss
 
                     v_loss.append(loss.item())
                     v_acc.extend((1 - torch.abs(pred[:, 4] - seq[1][:, 4])).tolist())   # checking accuracy of close on last day... lookahead days out
