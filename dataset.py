@@ -43,7 +43,7 @@ class SP_500(Dataset):
         Returns length of dataset
         
         Outputs:
-        : length (int) - length of dataset
+            - length (int) - length of dataset
         '''
         length = len(self.data)
         return length
@@ -54,12 +54,12 @@ class SP_500(Dataset):
         Gets individual stock history for training 
 
         Inputs:
-        : idx (int) - index to refernece from self.data
+            idx (int) - index to refernece from self.data
 
         Outputs:
-        : x (tensor) - training input data
-        : mins (tensor) - minimum values for all input features
-        : maxs (tensor) - maximum values for all input features
+            - x (tensor) - training input data
+            - mins (tensor) - minimum values for all input features
+            - maxs (tensor) - maximum values for all input features
         '''
 
         # cvs to read from

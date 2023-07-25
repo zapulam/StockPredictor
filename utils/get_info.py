@@ -14,9 +14,9 @@ def get_info(args):
     Creates csv file with info on all S&P 500 stocks, including ticker symbols
     
     Inputs:
-    : args (dict) - arguments passed in via argparser
-        : url (str) - wiki url of Fortune 500 companies
-        : info (str) - save path
+        args (dict) - arguments passed in via argparser
+            - url (str) - wiki url of Fortune 500 companies
+            - info (str) - save path
     '''
     url, info, = args.url, args.info
 
@@ -34,9 +34,9 @@ def parse_args():
     Saves cmd line arguments for training, should be ran with utils as cwd
     
     Outputs:
-    : args (dict) - cmd line aruments for training
-        : url (str) - wiki url of Fortune 500 companies
-        : info (str) - save path
+        args (dict) - cmd line aruments for training
+            - url (str) - wiki url of Fortune 500 companies
+            - info (str) - save path
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--url', type=str, default='https://en.wikipedia.org/wiki/List_of_S%26P_500_companies', help='wiki url of Fortune 500 companies')

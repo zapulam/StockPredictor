@@ -21,19 +21,21 @@ def predict(args):
     Predicts stock prices n days in the future for all S&P 500 stocks and saves predictions to specified location
     
     Inputs:
-    : args (dict) - arguments passed in via argparser
-        : weights (str) - path to model weights
-        : skip (bool) - skip most recent daily data download
-        : steps (int) - future time steps to predict
-        : device (str) - device to use for prediction
-        : savepath (str) - path to save predictions
+        args (dict) - arguments passed in via argparser
+            - weights (str) - path to model weights
+            - skip (bool) - skip most recent daily data download
+            - steps (int) - future time steps to predict
+            - device (str) - device to use for prediction
+            - savepath (str) - path to save predictions
     '''
     weights, skip, steps, device, savepath = \
         args.weights, args.skip, args.steps, args.device, args.savepath
 
+    # Get list of stock tickers
     df = pd.read_csv('utils/S&P500-Info.csv')
     symbols = df['Symbol'].tolist()
     
+    # Download most recent daily prices data before making predictions
     if not skip:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'} # this is chrome, you can set whatever browser you like
 
@@ -59,7 +61,7 @@ def predict(args):
                 data.to_csv(os.path.join('daily_prices', symbol + '.csv'), index = False)
                 sys.stdout.write('\rGetting data for: %s - DONE' % symbol.ljust(5))
 
-    # Create unique save path for predictions
+    # Create unique folder for predictions
     k, newpath = 2, 'predictions/' + savepath
     while True:
         if not os.path.isdir(newpath):
@@ -89,11 +91,13 @@ def predict(args):
         if 'cuda' in device:
             predictions = predictions.cuda()
 
+        # Load input data
         data = pd.read_csv('daily_prices/' + stock + '.csv', index_col=0)
-        x = data[['Open', 'High', 'Low', 'Volume', 'Close']]   # input data
+        x = data[['Open', 'High', 'Low', 'Volume', 'Close']] 
 
         mins, maxs = x.min(), x.max()   # values for normalization
 
+        # Normalize input data
         x = (x-mins)/(maxs-mins)
         x = torch.tensor(x.values)
         x = torch.unsqueeze(x, dim=0)
@@ -112,6 +116,7 @@ def predict(args):
 
             x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
 
+        # Un-normalize input data and save
         predictions = predictions*(maxs-mins)+mins
         predictions = pd.DataFrame(predictions.cpu().squeeze().detach().numpy(), columns=['Open', 'High', 'Low', 'Volume', 'Close'])
         predictions.to_csv(os.path.join(newpath, stock + '.csv'), index = False)
@@ -127,12 +132,12 @@ def parse_args():
     Saves cmd line arguments for training
     
     Outputs:
-    : args (dict) - cmd line aruments for training
-        : weights (str) - path to model weights
-        : skip (bool) - skip most recent daily data download
-        : steps (int) - future time steps to predict
-        : device (str) - device to use for prediction
-        : savepath (str) - path to save predictions
+        args (dict) - cmd line aruments for training
+            - weights (str) - path to model weights
+            - skip (bool) - skip most recent daily data download
+            - steps (int) - future time steps to predict
+            - device (str) - device to use for prediction
+            - savepath (str) - path to save predictions
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, default='models/rnn/weights/best.pth', help='Path to model weights')

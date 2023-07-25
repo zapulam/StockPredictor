@@ -21,27 +21,28 @@ def train(args):
     Trains RNN on S&P 500 daily stock prices data to predict future close price and saves model to specified path
 
     Inputs:
-    : args (dict) - arguments passed in via argparser
-        : hidden (int) - number of hidden layers
-        : layers (int) - number of recurrent layers
-        : data (str) - path to prices data
-        : epochs (int) - number of training epochs
-        : lr (float) - learning rate
-        : bs (int) - batch size
-        : workers (int) - number of worker nodes
-        : lookback (int) - minimum lookback range for historical data
-        : device (str) - device to use for trainng
-        : savepath (str) - path to save model
+        args (dict) - arguments passed in via argparser
+            - hidden (int) - number of hidden layers.
+            - layers (int) - number of recurrent layers.
+            - data (str) - path to prices datA.
+            - epochs (int) - number of training epochs.
+            - lr (float) - learning rate.
+            - bs (int) - batch size.
+            - workers (int) - number of worker nodes.
+            - lookback (int) - minimum lookback range for historical data.
+            - device (str) - device to use for trainng.
+            - savepath (str) - path to save model.
     '''
     hidden_dim, num_layers, folder, epochs, \
-        lr, bs, workers, lookback, device, savepath = \
+        lr, bs, workers, lookback, lookahead, device, savepath = \
         args.hidden, args.layers, args.data, args.epochs, \
-        args.lr, args.bs, args.workers, args.lookback, args.device, args.savepath
+        args.lr, args.bs, args.workers, args.lookback, args.lookahead, args.device, args.savepath
 
+    # Make models folder
     if not os.path.isdir('models'):
         os.mkdir('models')
 
-    # Create unique save path
+    # Make unique model folder
     k, newpath = 2, 'models/' + savepath
     while True:
         if not os.path.isdir(newpath):
@@ -50,6 +51,8 @@ def train(args):
         else:
             newpath = 'models/' + savepath + "_" + str(k)
             k += 1
+
+    # Make weights folder
     os.mkdir(os.path.join(newpath, 'weights'))
 
     print(f"\n--> Created folder \"{newpath}\"")
@@ -78,19 +81,18 @@ def train(args):
     criterion = torch.nn.MSELoss(reduction='mean')
     optimiser = torch.optim.Adam(model.parameters(), lr=lr)
 
-    best = 10000
+    best = 100
 
     print("\nBeginning training...")
+
     for epoch in range(epochs):
         print(f"\nEpoch: {epoch + 1} of {epochs}")
         start = time.time()
 
-        t_loss = []     # training losses
-        t_acc = []      # training accuracy (Close)
-        v_loss = []     # validation losses
-        v_acc = []      # validation accuracy (Close)
+        t_loss, t_acc = [], []   # training losses and accuracy 
+        v_loss, v_acc = [], []   # validation losses and accuracy 
 
-        # For each batch in the dataloader
+        # Training
         for _, data in enumerate(tqdm(trainloader, desc='Training', ascii=True, bar_format='{l_bar}{bar:50}{r_bar}{bar:-50b}')):
             inputs = data[0]
 
@@ -100,22 +102,36 @@ def train(args):
             seqs = []   # to be a list of [tensor(bs, 0-n, feats), tensor(bs, n+1, feats)]... [input, expected output]
 
             # Create sequences of min length lookback and max length inputs.shape[1]
-            for i in range(lookback, inputs.shape[1]-1):
-                seqs.append([inputs[:, 0:i, :], inputs[:, i, :]])   # [inputs[bs, 0 to n, feats], inputs[bs, n, feats], ...]
+            for i in range(lookback, inputs.shape[1]-lookahead):
+                seqs.append([inputs[:, 0:i, :], inputs[:, i:i+lookahead, :]])   # list like... [inputs[bs, 0 to n, feats], inputs[bs, n to lookahead, feats], ...]
 
             # Train model for each sequence
             for _, seq in enumerate(seqs):
-                pred = model(seq[0].float())
+                size = seq[0].size()[0]   # batch size (not always equal to bs during last enumeration of dataloader)
 
-                loss = criterion(pred, seq[1].float())
+                predictions = torch.rand(size,0,5)  # tensor to store future predictions
+                if 'cuda' in device:
+                    predictions = predictions.cuda()
+
+                x = seq[0].float()   # get inputs from seq
+                y = seq[1].float()   # get ground truth from seq
+
+                for _ in range(lookahead):
+                    pred = model(x)   # model prediction for one time step
+                    pred = torch.unsqueeze(pred, dim=1)
+                    
+                    predictions = torch.cat((predictions, pred), dim=1)   # append predicition to full predictions tensor
+
+                    x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
+
+                loss = criterion(predictions, y)   # calculate loss
 
                 t_loss.append(loss.item())
-                t_acc.extend((1 - torch.abs(pred[:, 4] - seq[1][:, 4])).tolist())
-                ###t_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
+                t_acc.extend((1 - torch.abs(predictions[:, -1, 4] - seq[1][:, -1, 4])).tolist())   # checking accuracy of close on last day... lookahead days out
 
-                optimiser.zero_grad()
-                loss.backward()
-                optimiser.step()
+                optimiser.zero_grad()   # zero gradients
+                loss.backward()         # compute gradients
+                optimiser.step()        # update model parameters
 
         # Validation
         with torch.no_grad():
@@ -125,20 +141,35 @@ def train(args):
                 if 'cuda' in device:
                     inputs = inputs.cuda()
 
+                seqs = []   # to be a list of [tensor(bs, 0-n, feats), tensor(bs, n+1, feats)]... [input, expected output]
+
                 # Create sequences of min length lookback and max length inputs.shape[1]
-                for i in range(lookback, inputs.shape[1]-1):
-                    if i + lookback < inputs.shape[1]:
-                        seqs.append([inputs[:, 0:i, :], inputs[:,i, :]])
+                for i in range(lookback, inputs.shape[1]-lookahead):
+                    seqs.append([inputs[:, 0:i, :], inputs[:, i:i+lookahead, :]])
 
-                # Validate for each sequence
+                # Validate model for each sequence
                 for _, seq in enumerate(seqs):
-                    pred = model(seq[0].float())
+                    size = seq[0].size()[0]   # batch size (not always equal to bs during last enumeration of dataloader)
 
-                    loss = criterion(pred, seq[1].float())
+                    predictions = torch.rand(size,0,5)   # tensor to store future predictions
+                    if 'cuda' in device:
+                        predictions = predictions.cuda()
+
+                    x = seq[0].float()   # get inputs from seq
+                    y = seq[1].float()   # get ground truth from seq
+                    
+                    for _ in range(lookahead):
+                        pred = model(x)   # model prediction for one time step
+                        pred = torch.unsqueeze(pred, dim=1)
+                        
+                        predictions = torch.cat((predictions, pred), dim=1)   # append predicition to full predictions tensor
+
+                        x = torch.cat((x, pred), dim=1)   # append predicition to input data for next time step
+
+                    loss = criterion(predictions, y)   # calculate loss
 
                     v_loss.append(loss.item())
-                    v_acc.extend((1 - torch.abs(pred[:, 4] - seq[1][:, 4])).tolist())
-                    ###v_acc.extend(torch.abs((pred[:, 4] - seq[1][:, 4])*(data[2][:, 4]-data[1][:, 4])+data[1][:, 4]).squeeze().tolist())
+                    v_acc.extend((1 - torch.abs(predictions[:, -1, 4] - seq[1][:, -1, 4])).tolist())   # checking accuracy of close on last day... lookahead days out
 
         end = time.time()
 
@@ -178,17 +209,17 @@ def parse_args():
     Saves cmd line arguments for training
     
     Outputs:
-    : args (dict) - cmd line aruments for training
-        : hidden (int) - number of hidden layers
-        : layers (int) - number of recurrent layers
-        : data (str) - path to prices data
-        : epochs (int) - number of training epochs
-        : lr (float) - learning rate
-        : bs (int) - batch size
-        : workers (int) - number of worker nodes
-        : lookback (int) - minimum lookback range for historical data
-        : device (str) - device to use for trainng
-        : savepath (str) - path to save model
+        args (dict) - cmd line aruments for training
+            - hidden (int) - number of hidden layers.
+            - layers (int) - number of recurrent layers.
+            - data (str) - path to prices data.
+            - epochs (int) - number of training epochs.
+            - lr (float) - learning rate.
+            - bs (int) - batch size.
+            - workers (int) - number of worker nodes.
+            - lookback (int) - minimum lookback range for historical data.
+            - device (str) - device to use for trainng.
+            - savepath (str) - path to save model.
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden', type=int, default=32, help='Number of features in hidden state')
@@ -196,12 +227,13 @@ def parse_args():
 
     parser.add_argument('--data', type=str, default='daily_prices', help='Path to prices data')
 
-    parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
+    parser.add_argument('--epochs', type=int, default=5, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
-    parser.add_argument('--bs', type=int, default=4, help='Batch size')
+    parser.add_argument('--bs', type=int, default=16, help='Batch size')
     parser.add_argument('--workers', type=int, default=0, help='Number of workers')
 
-    parser.add_argument('--lookback', type=int, default=60, help='Specifiy min lookback range')
+    parser.add_argument('--lookback', type=int, default=252, help='Specify min lookback range')
+    parser.add_argument('--lookahead', type=int, default=5, help='Specify lookahead range')
 
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:n or cpu')
 

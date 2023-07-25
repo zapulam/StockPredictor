@@ -27,10 +27,10 @@ class LSTM(nn.Module):
         Feed forward sequence
         
         Inputs:
-        : x (tensor) - input features ('Open', 'High', 'Low', 'Volume', 'Close')
+            - x (tensor) - input features ('Open', 'High', 'Low', 'Volume', 'Close')
         
         Outputs:
-        : out (tensor) - prediction ('Open', 'High', 'Low', 'Volume', 'Close')
+            - out (tensor) - prediction ('Open', 'High', 'Low', 'Volume', 'Close')
         '''
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim, device=x.device).requires_grad_()
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim, device=x.device).requires_grad_()

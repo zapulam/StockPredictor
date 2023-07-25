@@ -1,0 +1,29 @@
+utils package
+=============
+
+Submodules
+----------
+
+utils.get\_data module
+----------------------
+
+.. automodule:: utils.get_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+utils.get\_info module
+----------------------
+
+.. automodule:: utils.get_info
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
