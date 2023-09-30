@@ -20,22 +20,27 @@ class SP_500(Dataset):
         self.data = []
         self.folder = folder
 
+        # create list of files: [A.csv, AAL.csv, ...]
         all_files = os.listdir(folder)
         if '_.txt' in all_files: all_files.remove('_.txt')
         files = []
 
         # set max file length ( 5 years worth of data )
-        max = 1257
+        max = 0
+        for file in all_files:
+            df = pd.read_csv(os.path.join(folder, file), index_col=0)
+            length = len(df.index) 
+            if length > max:
+                max = length
 
         # remove files with less than 5 years of data
         for file in all_files:
-            data = pd.read_csv(os.path.join(folder, file), index_col=0)
-            if len(data.index) == max:
+            df = pd.read_csv(os.path.join(folder, file), index_col=0)
+            if len(df.index) == max:
                 files.append(file)
 
-        # create list of files: [A.csv, AAL.csv, ...]
-        for file in files:
-            self.data.append(file)
+        
+        self.data = files
 
 
     def __len__(self):
