@@ -39,7 +39,6 @@ class SP_500(Dataset):
             if len(df.index) == max:
                 files.append(file)
 
-        
         self.data = files
 
 
